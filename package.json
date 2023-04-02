@@ -12,6 +12,10 @@
   "files": [
     "lib/**/*"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SchedulerX/scheduler4js.git"
+  },
   "keywords": [],
   "author": "Halil Baydar",
   "license": "ISC",
