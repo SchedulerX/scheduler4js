@@ -1,0 +1,13 @@
+.editorconfig
+.idea
+.jsdoc.json
+.travis.yml
+docs
+Makefile
+renovate.json
+test
+yarn.lock
+lib/**
+tsconfig.json
+tslint.json
+.prettierrc
