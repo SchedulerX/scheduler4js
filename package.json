@@ -16,7 +16,15 @@
     "type": "git",
     "url": "git+https://github.com/SchedulerX/scheduler4js.git"
   },
-  "keywords": [],
+  "keywords": [
+    "scheduler",
+    "nodejs",
+    "sql",
+    "job",
+    "cron",
+    "runner",
+    "jobs"
+  ],
   "author": "Halil Baydar",
   "license": "ISC",
   "devDependencies": {
