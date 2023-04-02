@@ -1,3 +1,3 @@
-import { Model } from "sequelize/types";
+import { Model } from "sequelize";
 
 export class ParentModel<T extends {}, K extends {}> extends Model<T, K> {}

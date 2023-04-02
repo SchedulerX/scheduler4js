@@ -1,4 +1,4 @@
-import { DbConfig } from "./database";
+import { Options } from "sequelize/types";
 
 export interface SchedulerContextOption {
   start: boolean;
@@ -6,5 +6,5 @@ export interface SchedulerContextOption {
   maxConcurrency: number;
   lockLimit: number;
   defaultLockLifetime?: number;
-  dbConfig: DbConfig;
+  dbConfig: Options;
 }

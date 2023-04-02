@@ -6,8 +6,6 @@ export interface JobEntityAttributes {
 
   context: Context;
 
-  type: string;
-
   name: string;
 
   disabled: boolean;
