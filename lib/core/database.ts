@@ -34,6 +34,10 @@ export class Database<K extends {}, T extends ParentModel<T, K>>
           type: DataTypes.DATE,
           allowNull: false,
         },
+        lockedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+        },
         priority: {
           type: DataTypes.BIGINT,
           allowNull: false,

@@ -15,7 +15,8 @@ export class JobLogModel
   job!: JSON;
   resultStatus!: string;
   failReason?: string | null;
-  cancelledAt?: Date | null;
+  disabledAt?: Date | null;
+  disabled?: boolean | null;
   createdAt!: Date;
   updatedAt?: Date;
 }

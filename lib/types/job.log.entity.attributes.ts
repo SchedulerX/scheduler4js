@@ -1,4 +1,4 @@
-import { Optional } from "./optional";
+import { Optional } from "sequelize";
 
 export enum Status {
   ERROR = "500",
@@ -15,12 +15,16 @@ export interface JobLogEntityAttributes {
   job: JSON;
   resultStatus: JobResultStatus;
   failReason?: string | null;
-  cancelledAt?: Date | null;
+  disabledAt?: Date | null;
+  disabled?: boolean | null;
   createdAt: Date;
   updatedAt?: Date;
 }
 
-export type JobLogEntityOptionalAttributes = "failReason" | "cancelledAt";
+export type JobLogEntityOptionalAttributes =
+  | "failReason"
+  | "disabledAt"
+  | "disabled";
 export type JobLogEntityCreationAttributes = Optional<
   JobLogEntityAttributes,
   JobLogEntityOptionalAttributes

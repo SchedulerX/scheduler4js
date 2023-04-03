@@ -11,8 +11,8 @@ export class JobModel
 {
   id!: BigInt;
   context!: Context;
-  type!: string;
   name!: string;
+  type!: string;
   disabled!: boolean;
   nextRunAt!: Date;
   lockedAt?: Date | null | undefined;
@@ -20,8 +20,6 @@ export class JobModel
   data?: any;
   cron!: string;
   timezone!: string;
-  lastRunAt?: Date | undefined;
-  lastFinishedAt?: Date | undefined;
   failCount!: BigInt;
   successCount!: BigInt;
   status!: string;
