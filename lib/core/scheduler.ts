@@ -12,6 +12,7 @@ import { Scheduler4JsFrequency } from "../enums/frequency";
 import {
   DEFAULT_CONCURRENCY,
   DEFAULT_JOB_TYPE,
+  DEFAULT_LOCK_EXPIRE,
   DEFAULT_LOCK_LIMIT,
   DEFAULT_TIMEZONE,
 } from "../constants/job.constants";
@@ -65,7 +66,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
         lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
       },
       status: JobStatus.WAITING,
-      lockExpire: config.lockExpire,
+      lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
     };
     return this;
   }
