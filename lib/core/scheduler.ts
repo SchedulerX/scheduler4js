@@ -154,7 +154,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     );
   }
 
-  private convertHumanIntervalToFrequency() {
+  private convertHumanIntervalToFrequency(): number {
     return (humanInterval(this.config.frequency) ??
       humanInterval(Scheduler4JsFrequency.ONCE_IN_HALF_MINUTE)) as number;
   }

@@ -56,7 +56,7 @@ export class SchedulerContext<Job, JobLog> {
   public localUnLockJob(job: IJob): void {
     const index = this.getLockedJobs().indexOf(job);
     const jobDefinitions = this.getJobDefinitions();
-    if (!~index) {
+    if (~index) {
       this.getLockedJobs().splice(index, 1);
       if (jobDefinitions[job.definition.option.name].lock! > 0) {
         jobDefinitions[job.definition.option.name].lock!--;
@@ -69,7 +69,10 @@ export class SchedulerContext<Job, JobLog> {
     this.jobQueue.push({
       definition: jobDefinition,
       addToRunningJobs: async function (): Promise<void> {
-        context.runningJobs.push(jobDefinition);
+        const index = context.runningJobs.indexOf(this.definition);
+        if (~index) {
+          context.runningJobs.push(this.definition);
+        }
       },
       addToFailedJobs: async function (): Promise<void> {
         context.failedJobs.push(jobDefinition);
