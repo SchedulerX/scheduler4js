@@ -33,7 +33,7 @@ export class Database<K extends {}, T extends ParentModel<T, K>>
           allowNull: false,
           defaultValue: false,
         },
-        nextRunAt: {
+        nextTickAt: {
           type: DataTypes.DATE,
           allowNull: true,
         },

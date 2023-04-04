@@ -74,10 +74,7 @@ export class SchedulerContext<Job, JobLog> {
     this.jobQueue.push({
       definition: jobDefinition,
       addToRunningJobs: async function (): Promise<void> {
-        const index = context.runningJobs.indexOf(this);
-        if (index > -1) {
-          context.runningJobs.push(this);
-        }
+        context.runningJobs.push(this);
       },
       addToFailedJobs: async function (): Promise<void> {
         context.failedJobs.push(this);
