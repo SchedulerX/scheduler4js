@@ -1,9 +1,11 @@
+import { JobStatus } from "../enums/job.status";
 import { IJob } from "../types/job";
 import { IJobDefinition } from "../types/job.definition";
 import { ISchedulerRepository } from "../types/repository";
 
 export class SchedulerContext<Job, JobLog> {
   private runningJobs: IJobDefinition[] = [];
+  private failedJobs: IJobDefinition[] = [];
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
   private jobRepository: ISchedulerRepository<Job>;
   private jobLogRepository: ISchedulerRepository<JobLog>;
@@ -60,5 +62,32 @@ export class SchedulerContext<Job, JobLog> {
         jobDefinitions[job.definition.option.name].lock!--;
       }
     }
+  }
+
+  public injectJob(jobDefinition: IJobDefinition): void {
+    const context = this;
+    this.jobQueue.push({
+      definition: jobDefinition,
+      addToRunningJobs: async function (): Promise<void> {
+        context.runningJobs.push(jobDefinition);
+      },
+      addToFailedJobs: async function (): Promise<void> {
+        context.failedJobs.push(jobDefinition);
+      },
+      changeJobStatus: async function (status: JobStatus): Promise<void> {
+        this.definition.status = status;
+        context.jobDefinitions[jobDefinition.option.name].status = status;
+      },
+      run: async function (): Promise<void> {
+        await this.definition.option.fn();
+      },
+      isExpired: function (): boolean {
+        const lockDeadline = new Date(Date.now() - this.definition.lockExpire);
+        return (
+          (context.jobDefinitions[jobDefinition.option.name].lockedAt ||
+            Date.now()) < lockDeadline
+        );
+      },
+    });
   }
 }

@@ -15,6 +15,7 @@ import {
   DEFAULT_LOCK_LIMIT,
   DEFAULT_TIMEZONE,
 } from "../constants/job.constants";
+import { JobStatus } from "../enums/job.status";
 
 export class Scheduler4Js extends EventEmitter implements IScheduler {
   private context: SchedulerContext<JobModel, JobLogModel>;
@@ -63,6 +64,8 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
         concurrency: config.concurrency || DEFAULT_CONCURRENCY,
         lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
       },
+      status: JobStatus.WAITING,
+      lockExpire: config.lockExpire,
     };
     return this;
   }
