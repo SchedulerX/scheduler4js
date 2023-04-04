@@ -4,13 +4,14 @@ import { IJobDefinition } from "../types/job.definition";
 import { ISchedulerRepository } from "../types/repository";
 
 export class SchedulerContext<Job, JobLog> {
-  private runningJobs: IJobDefinition[] = [];
-  private failedJobs: IJobDefinition[] = [];
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
   private jobRepository: ISchedulerRepository<Job>;
   private jobLogRepository: ISchedulerRepository<JobLog>;
+
   private jobQueue: IJob[] = [];
   private lockedJobs: IJob[] = [];
+  private failedJobs: IJob[] = [];
+  private runningJobs: IJob[] = [];
 
   constructor(
     jobRepository: ISchedulerRepository<Job>,
@@ -30,6 +31,10 @@ export class SchedulerContext<Job, JobLog> {
 
   public getLockedJobs(): IJob[] {
     return this.lockedJobs;
+  }
+
+  public getFailedJobs(): IJob[] {
+    return this.failedJobs;
   }
 
   public getJobRepository(): ISchedulerRepository<Job> {
@@ -56,7 +61,7 @@ export class SchedulerContext<Job, JobLog> {
   public localUnLockJob(job: IJob): void {
     const index = this.getLockedJobs().indexOf(job);
     const jobDefinitions = this.getJobDefinitions();
-    if (~index) {
+    if (index > -1) {
       this.getLockedJobs().splice(index, 1);
       if (jobDefinitions[job.definition.option.name].lock! > 0) {
         jobDefinitions[job.definition.option.name].lock!--;
@@ -69,13 +74,13 @@ export class SchedulerContext<Job, JobLog> {
     this.jobQueue.push({
       definition: jobDefinition,
       addToRunningJobs: async function (): Promise<void> {
-        const index = context.runningJobs.indexOf(this.definition);
-        if (~index) {
-          context.runningJobs.push(this.definition);
+        const index = context.runningJobs.indexOf(this);
+        if (index > -1) {
+          context.runningJobs.push(this);
         }
       },
       addToFailedJobs: async function (): Promise<void> {
-        context.failedJobs.push(jobDefinition);
+        context.failedJobs.push(this);
       },
       changeJobStatus: async function (status: JobStatus): Promise<void> {
         this.definition.status = status;
@@ -91,6 +96,17 @@ export class SchedulerContext<Job, JobLog> {
             Date.now()) < lockDeadline
         );
       },
+      finalize: function (): void {
+        const index = context.runningJobs.indexOf(this);
+        if (index > -1) {
+          context.runningJobs.splice(index, 1);
+        }
+        const indexOfQueue = context.jobQueue.indexOf(this);
+        if (indexOfQueue > -1) {
+          context.jobQueue.splice(index, 1);
+        }
+      },
+      calculateNextTick: function (): void {},
     });
   }
 }

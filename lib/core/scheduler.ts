@@ -71,7 +71,23 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     return this;
   }
 
-  private async executeJobs(): Promise<void> {}
+  private async executeJobs(): Promise<void> {
+    const jobQueue = this.context.getJobQueue();
+    Promise.all(
+      jobQueue.map(async (job): Promise<void> => {
+        await this.preRunJob(job);
+        try {
+          job.addToRunningJobs();
+          await job.run();
+          job.finalize();
+        } catch (err) {
+          job.addToFailedJobs();
+        } finally {
+          await this.postRunJob(job);
+        }
+      })
+    );
+  }
 
   public kickOfJobs(): void {
     setInterval(
@@ -95,6 +111,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
   }
 
   private async postRunJob(job: IJob): Promise<Scheduler4Js> {
+    job.calculateNextTick();
     this.context.localUnLockJob(job);
     await this.globalUnLockJob(job);
     return this;
