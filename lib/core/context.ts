@@ -18,10 +18,6 @@ export class SchedulerContext<Job, JobLog> {
     this.jobLogRepository = jobLoRepository;
   }
 
-  public defineJob(definition: IJobDefinition): Promise<void> {
-    return Promise.resolve();
-  }
-
   public getJobDefinitions(): { [key: string]: IJobDefinition } {
     return this.jobDefinitions;
   }
@@ -34,7 +30,35 @@ export class SchedulerContext<Job, JobLog> {
     return this.lockedJobs;
   }
 
-  public getJobLogRepository(): ISchedulerRepository<Job> {
+  public getJobRepository(): ISchedulerRepository<Job> {
+    return this.jobRepository;
+  }
+
+  public getJobLogRepository(): ISchedulerRepository<JobLog> {
     return this.jobLogRepository;
+  }
+
+  public localLockJob(job: IJob): boolean {
+    const jobDefinitions = this.getJobDefinitions();
+    if (
+      jobDefinitions[job.definition.option.name].lock! <
+      jobDefinitions[job.definition.option.name].option.lockLimit!
+    ) {
+      this.getLockedJobs().push(job);
+      jobDefinitions[job.definition.option.name].lock!++;
+      return true;
+    }
+    return false;
+  }
+
+  public localUnLockJob(job: IJob): void {
+    const index = this.getLockedJobs().indexOf(job);
+    const jobDefinitions = this.getJobDefinitions();
+    if (!~index) {
+      this.getLockedJobs().splice(index, 1);
+      if (jobDefinitions[job.definition.option.name].lock! > 0) {
+        jobDefinitions[job.definition.option.name].lock!--;
+      }
+    }
   }
 }

@@ -1,10 +1,10 @@
 import { CreateOptions, FindOptions, UpdateOptions } from "sequelize";
 
 export interface ISchedulerRepository<T> {
-  findOne<T>(query: FindOptions<T>): Promise<T>;
-  update<T>(
+  findOne(query: FindOptions<T>): Promise<T>;
+  update(
     data: Partial<T>,
     query: UpdateOptions
   ): Promise<{ count: number; rows: T[] }>;
-  save<T>(t: T, option: CreateOptions): Promise<T>;
+  save(t: Partial<T>, option: CreateOptions): Promise<T>;
 }

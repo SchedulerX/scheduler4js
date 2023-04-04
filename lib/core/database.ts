@@ -5,6 +5,8 @@ import { JobLogModel } from "../models/model.job.log";
 import { ParentModel } from "../models/parent.model";
 import { IDatabase } from "../types/database";
 import { Sequelize } from "sequelize-typescript";
+import { JobStatus } from "../enums/job.status";
+import { DEFAULT_JOB_TYPE } from "../constants/job.constants";
 
 export class Database<K extends {}, T extends ParentModel<T, K>>
   implements IDatabase
@@ -29,18 +31,20 @@ export class Database<K extends {}, T extends ParentModel<T, K>>
         disabled: {
           type: DataTypes.BOOLEAN,
           allowNull: false,
+          defaultValue: false,
         },
         nextRunAt: {
           type: DataTypes.DATE,
-          allowNull: false,
+          allowNull: true,
         },
         lockedAt: {
           type: DataTypes.DATE,
-          allowNull: false,
+          allowNull: true,
         },
         priority: {
           type: DataTypes.BIGINT,
           allowNull: false,
+          defaultValue: 0,
         },
         cron: {
           type: DataTypes.STRING,
@@ -49,18 +53,27 @@ export class Database<K extends {}, T extends ParentModel<T, K>>
         timezone: {
           type: DataTypes.STRING,
           allowNull: false,
+          defaultValue: "gtm0",
         },
         failCount: {
           type: DataTypes.BIGINT,
           allowNull: false,
+          defaultValue: 0,
         },
         successCount: {
           type: DataTypes.BIGINT,
           allowNull: false,
+          defaultValue: 0,
         },
         status: {
           type: DataTypes.STRING,
           allowNull: false,
+          defaultValue: JobStatus.RUNNING,
+        },
+        type: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: DEFAULT_JOB_TYPE,
         },
       },
       {

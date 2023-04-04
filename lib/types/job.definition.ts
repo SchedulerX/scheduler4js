@@ -1,11 +1,16 @@
-export interface IJobOption {}
+export interface IJobOption {
+  name: string;
+  type?: string;
+  timezone?: string;
+  cron: string;
+  concurrency?: number;
+  lockLimit?: number;
+  data?: any;
+  fn: (...args: any[]) => any;
+}
 
 export interface IJobDefinition {
-  name: string;
-  cron: string;
   option: IJobOption;
-  concurrency: number;
   running: number;
-  data: any;
-  fn: (...args: any[]) => any;
+  lock?: number;
 }

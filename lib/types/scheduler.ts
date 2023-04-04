@@ -1,8 +1,8 @@
 import { JobModel } from "../models/model.job";
-import { IJobDefinition } from "./job.definition";
+import { IJobOption } from "./job.definition";
 
 export interface IScheduler {
-  defineJob(config: IJobDefinition): Promise<IScheduler>;
-  kickOfJob(): void;
+  createJob(config: IJobOption): Promise<IScheduler>;
+  kickOfJobs(): void;
   disableJob(job: JobModel): Promise<boolean>;
 }

@@ -6,7 +6,7 @@ export interface JobEntityAttributes {
   context: Context;
   name: string;
   disabled: boolean;
-  nextRunAt: Date;
+  nextRunAt?: Date;
   lockedAt?: Date | null;
   priority: BigInt;
   data?: any;
@@ -17,13 +17,16 @@ export interface JobEntityAttributes {
   failCount: BigInt;
   successCount: BigInt;
   status: string;
+  type: string;
 }
 
 export type JobEntityOptionalAttributes =
   | "lastRunAt"
   | "data"
   | "lastRunAt"
-  | "lastFinishedAt";
+  | "nextRunAt"
+  | "lastFinishedAt"
+  | "type";
 
 export type JobEntityCreationAttributes = Optional<
   JobEntityAttributes,
