@@ -1,3 +1,4 @@
+import { Model } from "sequelize";
 import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
@@ -5,7 +6,7 @@ import { IJobDefinition } from "../types/job.definition";
 import { ISchedulerRepository } from "../types/repository";
 import * as parser from "cron-parser";
 
-export class SchedulerContext<Job, JobLog> {
+export class SchedulerContext<Job extends Model, JobLog extends Model> {
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
   private jobRepository: ISchedulerRepository<Job>;
   private jobLogRepository: ISchedulerRepository<JobLog>;
@@ -78,18 +79,21 @@ export class SchedulerContext<Job, JobLog> {
   public injectJob(job: JobModel): void {
     const context = this;
     this.jobQueue.push({
-      definition: this.jobDefinitions[job.name],
+      definition: context.jobDefinitions[job.name],
       moveToRunningJobs: async function (): Promise<void> {
         context.runningJobs.push(this);
+        this.changeJobStatus(JobStatus.RUNNING);
       },
       moveToFailedJobs: async function (): Promise<void> {
         context.failedJobs.push(this);
+        this.changeJobStatus(JobStatus.FAILED);
       },
       changeJobStatus: async function (status: JobStatus): Promise<void> {
         this.definition.status = status;
         context.jobDefinitions[
           context.jobDefinitions[job.name].option.name
         ].status = status;
+        this.definition.status = status;
       },
       run: async function (): Promise<void> {
         await this.definition.option.fn();
@@ -110,6 +114,7 @@ export class SchedulerContext<Job, JobLog> {
         if (indexOfQueue > -1) {
           context.jobQueue.splice(index, 1);
         }
+        this.changeJobStatus(JobStatus.FINISHED);
       },
       calculateNextTick: function (): void {
         const expression = this.definition.option.cron!;
@@ -125,6 +130,12 @@ export class SchedulerContext<Job, JobLog> {
       },
       save: async function (): Promise<JobModel> {
         return await job.save();
+      },
+      removeFromQueue: function (): void {
+        const index = context.jobQueue.indexOf(this);
+        if (index > -1) {
+          context.jobQueue.splice(index, 1);
+        }
       },
     });
   }

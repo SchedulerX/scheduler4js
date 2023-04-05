@@ -1,4 +1,3 @@
-import humanInterval = require("human-interval");
 import { Op } from "sequelize";
 import { EventEmitter } from "stream";
 import { JobModel } from "../models/model.job";
@@ -8,7 +7,6 @@ import { IJobDefinition, IJobOption } from "../types/job.definition";
 import { IScheduler } from "../types/scheduler";
 import { SchedulerConfig } from "../types/scheduler.cofig";
 import { SchedulerContext } from "./context";
-import { Scheduler4JsFrequency } from "../enums/frequency";
 import {
   DEFAULT_CONCURRENCY,
   DEFAULT_JOB_TYPE,
@@ -28,6 +26,10 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     super();
     this.context = context;
     this.config = config;
+  }
+
+  public tick(): void {
+    setInterval(this.kickOffJobs.bind(this), this.config.frequency);
   }
 
   async createJob(config: IJobOption): Promise<IScheduler> {
@@ -101,15 +103,17 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
   }
 
   private async executeJob(): Promise<void> {
-    const job = this.findNextJobToRun();
+    const job = this.finJobToRun();
     if (!job) return;
     try {
-      await this.preRunJob(job);
-      job.moveToRunningJobs();
-      await job.run();
-      job.finalize();
-      job.calculateNextTick();
-      job.save();
+      job.removeFromQueue();
+      if (await this.preRunJob(job)) {
+        job.moveToRunningJobs();
+        await job.run();
+        job.finalize();
+        job.calculateNextTick();
+        job.save();
+      }
     } catch (err) {
       job.moveToFailedJobs();
     } finally {
@@ -117,18 +121,20 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     }
   }
 
-  private async preRunJob(job: IJob): Promise<Scheduler4Js> {
+  private async preRunJob(job: IJob): Promise<boolean> {
     if (this.context.localLockJob(job)) {
       try {
-        await this.globalLockJob(job);
+        if (await this.globalLockJob(job)) {
+          return true;
+        }
       } catch (err) {
         console.debug(`Error while locking job, message: ${err}`);
         this.context.localUnLockJob(job);
-        throw err;
       }
+      return false;
     }
-    console.debug(`Job with name :${job.definition.option.name} locked`);
-    return this;
+    console.debug(`Job with name :${job.definition.option.name} cannot locked`);
+    return false;
   }
 
   private async postRunJob(job: IJob): Promise<Scheduler4Js> {
@@ -144,9 +150,8 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     return true;
   }
 
-  private findNextJobToRun(): IJob {
+  private finJobToRun(): IJob {
     const jobQueue = this.context.getJobQueue() || [];
-
     const jobDefinitions = this.context.getJobDefinitions() || [];
 
     let index: number = 0;
@@ -162,14 +167,15 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     return jobQueue[index];
   }
 
-  private async globalLockJob(job: IJob): Promise<void> {
+  private async globalLockJob(job: IJob): Promise<boolean> {
     const now = new Date().toUTCString();
-    await this.context
+    const count = await this.context
       .getJobRepository()
       .update(
         { lockedAt: new Date(now) },
         { where: { name: job.definition.option.name } }
       );
+    return count > 0;
   }
 
   private async globalUnLockJob(job: IJob): Promise<void> {
@@ -181,7 +187,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
       {
         where: {
           name: job.definition.option.name,
-          lockedAt: { [Op.gte]: lockDeadline },
+          lockedAt: { [Op.lte]: lockDeadline },
         },
       }
     );

@@ -3,6 +3,7 @@ import { JobModel } from "../models/model.job";
 import { IJobDefinition } from "./job.definition";
 
 export interface IJob {
+  removeFromQueue(): void;
   save(): Promise<JobModel>;
   moveToRunningJobs(): Promise<void>;
   moveToFailedJobs(): Promise<void>;
