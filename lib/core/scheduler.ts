@@ -17,12 +17,9 @@ import {
 import { JobStatus } from "../enums/job.status";
 
 export class Scheduler4Js extends EventEmitter implements IScheduler {
-  private context: SchedulerContext<JobModel, JobLogModel>;
+  private context: SchedulerContext;
   private config: SchedulerConfig;
-  constructor(
-    context: SchedulerContext<JobModel, JobLogModel>,
-    config: SchedulerConfig
-  ) {
+  constructor(context: SchedulerContext, config: SchedulerConfig) {
     super();
     this.context = context;
     this.config = config;
@@ -35,11 +32,11 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
   async createJob(config: IJobOption): Promise<IScheduler> {
     const jobRepository = this.context.getJobRepository();
     const jobDefinitions = this.context.getJobDefinitions();
-    let job: JobModel = await jobRepository.findOne({
+    let job = await jobRepository.findOne({
       where: { name: config.name, disabled: { [Op.ne]: true } },
     });
     if (job) {
-      await jobRepository.update(
+      await jobRepository.update<any>(
         {
           cron: config.cron,
           data: config.data,
@@ -47,17 +44,16 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
         { where: { id: job.id } }
       );
     } else {
-      job = await jobRepository.save(
-        {
-          name: config.name,
-          data: config.data,
-          disabled: false,
-          cron: config.cron,
-          timezone: config.timezone || DEFAULT_TIMEZONE,
-          type: config.type ?? DEFAULT_JOB_TYPE,
-        },
-        { returning: true }
-      );
+      job = await jobRepository.create<any>({
+        name: config.name,
+        data: config.data,
+        disabled: false,
+        cron: config.cron,
+        timezone: config.timezone || DEFAULT_TIMEZONE,
+        type: config.type ?? DEFAULT_JOB_TYPE,
+        priority: 0,
+        status: JobStatus.RUNNING,
+      });
     }
     jobDefinitions[config.name] = {
       running: 0,
@@ -82,7 +78,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
           name: string,
           jobDefinition: IJobDefinition
         ]): Promise<void> => {
-          const job: JobModel = await this.context.getJobRepository().findOne({
+          const job = await this.context.getJobRepository().findOne({
             where: {
               type: this.config.type ?? { [Op.ne]: null },
               name,
@@ -145,7 +141,10 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
 
   public async disableJob(job: JobModel): Promise<boolean> {
     const jobRepository = this.context.getJobRepository();
-    await jobRepository.update({ disabled: true }, { where: { id: job.id } });
+    await jobRepository.update<any>(
+      { disabled: true },
+      { where: { id: job.id } }
+    );
     this.context.removeDefinition(job.name);
     return true;
   }
@@ -169,7 +168,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
 
   private async globalLockJob(job: IJob): Promise<boolean> {
     const now = new Date().toUTCString();
-    const count = await this.context
+    const [count] = await this.context
       .getJobRepository()
       .update(
         { lockedAt: new Date(now) },

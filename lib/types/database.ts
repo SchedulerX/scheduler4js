@@ -6,4 +6,6 @@ export interface IDatabase {
   initJobTable(sequelize: Sequelize): typeof JobModel;
   initJobLogTable(sequelize: Sequelize): typeof JobLogModel;
   connect(options: Options): Sequelize;
+  getJob(): typeof JobModel | undefined;
+  getJobLog(): typeof JobLogModel | undefined;
 }

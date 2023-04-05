@@ -3,25 +3,22 @@ import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
 import { IJobDefinition } from "../types/job.definition";
-import { ISchedulerRepository } from "../types/repository";
 import * as parser from "cron-parser";
+import { JobLogModel } from "../models/model.job.log";
+import { IDatabase } from "../types/database";
 
-export class SchedulerContext<Job extends Model, JobLog extends Model> {
+export class SchedulerContext {
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
-  private jobRepository: ISchedulerRepository<Job>;
-  private jobLogRepository: ISchedulerRepository<JobLog>;
 
   private jobQueue: IJob[] = [];
   private lockedJobs: IJob[] = [];
   private failedJobs: IJob[] = [];
   private runningJobs: IJob[] = [];
 
-  constructor(
-    jobRepository: ISchedulerRepository<Job>,
-    jobLoRepository: ISchedulerRepository<JobLog>
-  ) {
-    this.jobRepository = jobRepository;
-    this.jobLogRepository = jobLoRepository;
+  private db: IDatabase;
+
+  constructor(db: IDatabase) {
+    this.db = db;
   }
 
   public getJobDefinitions(): { [key: string]: IJobDefinition } {
@@ -40,12 +37,12 @@ export class SchedulerContext<Job extends Model, JobLog extends Model> {
     return this.failedJobs;
   }
 
-  public getJobRepository(): ISchedulerRepository<Job> {
-    return this.jobRepository;
+  public getJobRepository(): typeof JobModel {
+    return this.db.getJob()!;
   }
 
-  public getJobLogRepository(): ISchedulerRepository<JobLog> {
-    return this.jobLogRepository;
+  public getJobLogRepository(): typeof JobLogModel {
+    return this.db.getJobLog()!;
   }
 
   public removeDefinition(name: string): void {

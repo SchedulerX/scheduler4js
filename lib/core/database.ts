@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { Options } from "sequelize/types";
 import { JobModel } from "../models/model.job";
 import { JobLogModel } from "../models/model.job.log";
@@ -8,11 +8,11 @@ import { Sequelize } from "sequelize-typescript";
 import { JobStatus } from "../enums/job.status";
 import { DEFAULT_JOB_TYPE } from "../constants/job.constants";
 
-export class Database<K extends {}, T extends ParentModel<T, K>>
-  implements IDatabase
-{
+export class Database implements IDatabase {
+  private jobTable: typeof JobModel | undefined;
+  private jobLogTable: typeof JobLogModel | undefined;
   initJobTable(sequelize: Sequelize): typeof JobModel {
-    return JobModel.init(
+    this.jobTable = JobModel.init(
       {
         id: {
           autoIncrement: true,
@@ -96,9 +96,10 @@ export class Database<K extends {}, T extends ParentModel<T, K>>
         ],
       }
     );
+    return this.jobTable;
   }
   initJobLogTable(sequelize: Sequelize): typeof JobLogModel {
-    return JobLogModel.init(
+    this.jobLogTable = JobLogModel.init(
       {
         id: {
           autoIncrement: true,
@@ -147,8 +148,15 @@ export class Database<K extends {}, T extends ParentModel<T, K>>
         ],
       }
     );
+    return this.jobLogTable;
   }
   connect(options: Options): Sequelize {
     return new Sequelize(options);
+  }
+  public getJob(): typeof JobModel | undefined {
+    return this.jobTable;
+  }
+  public getJobLog(): typeof JobLogModel | undefined {
+    return this.jobLogTable;
   }
 }

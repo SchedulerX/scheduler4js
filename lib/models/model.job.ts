@@ -10,18 +10,18 @@ export class JobModel
   implements JobEntityAttributes
 {
   id!: BigInt;
-  context!: Context;
+  context?: Context;
   name!: string;
   type!: string;
   disabled!: boolean;
-  nextTickAt!: Date;
-  lastTickAt!: Date;
+  nextTickAt?: Date;
+  lastTickAt?: Date;
   lockedAt?: Date | null | undefined;
-  priority!: BigInt;
+  priority!: number;
   data?: any;
   cron!: string;
   timezone!: string;
-  failCount!: BigInt;
-  successCount!: BigInt;
-  status!: string;
+  failCount?: BigInt;
+  successCount?: BigInt;
+  status!: number;
 }
