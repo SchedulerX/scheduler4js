@@ -1,4 +1,5 @@
 import { JobStatus } from "../enums/job.status";
+import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
 import { IJobDefinition } from "../types/job.definition";
 import { ISchedulerRepository } from "../types/repository";
@@ -45,6 +46,10 @@ export class SchedulerContext<Job, JobLog> {
     return this.jobLogRepository;
   }
 
+  public removeDefinition(name: string): void {
+    delete this.jobDefinitions[name];
+  }
+
   public localLockJob(job: IJob): boolean {
     const jobDefinitions = this.getJobDefinitions();
     if (
@@ -69,19 +74,21 @@ export class SchedulerContext<Job, JobLog> {
     }
   }
 
-  public injectJob(jobDefinition: IJobDefinition): void {
+  public injectJob(job: JobModel): void {
     const context = this;
     this.jobQueue.push({
-      definition: jobDefinition,
-      addToRunningJobs: async function (): Promise<void> {
+      definition: this.jobDefinitions[job.name],
+      moveToRunningJobs: async function (): Promise<void> {
         context.runningJobs.push(this);
       },
-      addToFailedJobs: async function (): Promise<void> {
+      moveToFailedJobs: async function (): Promise<void> {
         context.failedJobs.push(this);
       },
       changeJobStatus: async function (status: JobStatus): Promise<void> {
         this.definition.status = status;
-        context.jobDefinitions[jobDefinition.option.name].status = status;
+        context.jobDefinitions[
+          context.jobDefinitions[job.name].option.name
+        ].status = status;
       },
       run: async function (): Promise<void> {
         await this.definition.option.fn();
@@ -89,8 +96,8 @@ export class SchedulerContext<Job, JobLog> {
       isExpired: function (): boolean {
         const lockDeadline = new Date(Date.now() - this.definition.lockExpire);
         return (
-          (context.jobDefinitions[jobDefinition.option.name].lockedAt ||
-            Date.now()) < lockDeadline
+          (context.jobDefinitions[context.jobDefinitions[job.name].option.name]
+            .lockedAt || Date.now()) < lockDeadline
         );
       },
       finalize: function (): void {

@@ -12,7 +12,7 @@ export interface JobEntityAttributes {
   data?: any;
   cron: string;
   timezone: string;
-  lastRunAt?: Date;
+  lastTickAt?: Date;
   lastFinishedAt?: Date;
   failCount: BigInt;
   successCount: BigInt;
@@ -21,9 +21,8 @@ export interface JobEntityAttributes {
 }
 
 export type JobEntityOptionalAttributes =
-  | "lastRunAt"
   | "data"
-  | "lastRunAt"
+  | "lastTickAt"
   | "nextTickAt"
   | "lastFinishedAt"
   | "type";

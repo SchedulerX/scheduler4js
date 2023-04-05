@@ -4,7 +4,7 @@ import { EventEmitter } from "stream";
 import { JobModel } from "../models/model.job";
 import { JobLogModel } from "../models/model.job.log";
 import { IJob } from "../types/job";
-import { IJobOption } from "../types/job.definition";
+import { IJobDefinition, IJobOption } from "../types/job.definition";
 import { IScheduler } from "../types/scheduler";
 import { SchedulerConfig } from "../types/scheduler.cofig";
 import { SchedulerContext } from "./context";
@@ -71,29 +71,47 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     return this;
   }
 
-  private async executeJobs(): Promise<void> {
-    const jobQueue = this.context.getJobQueue();
-    Promise.all(
-      jobQueue.map(async (job): Promise<void> => {
-        await this.preRunJob(job);
-        try {
-          job.addToRunningJobs();
-          await job.run();
-          job.finalize();
-        } catch (err) {
-          job.addToFailedJobs();
-        } finally {
-          await this.postRunJob(job);
+  public async kickOffJobs(): Promise<void> {
+    const jobDefinitions = this.context.getJobDefinitions();
+    const lockExpire = new Date(Date.now() - this.config.lockLifetime);
+    await Promise.all(
+      Object.entries(jobDefinitions).map(
+        async ([name, jobDefinition]: [
+          name: string,
+          jobDefinition: IJobDefinition
+        ]): Promise<void> => {
+          const job: JobModel = await this.context.getJobRepository().findOne({
+            where: {
+              name,
+              disabled: { [Op.ne]: true },
+              [Op.or]: [
+                { lockedAt: null, nextTickAt: { [Op.lte]: new Date() } },
+                { lockedAt: { [Op.lte]: lockExpire } },
+              ],
+            },
+          });
+          if (job) {
+            this.context.injectJob(job);
+            await this.executeJob();
+          }
         }
-      })
+      )
     );
   }
 
-  public kickOfJobs(): void {
-    setInterval(
-      this.executeJobs.bind(this),
-      this.convertHumanIntervalToFrequency()
-    );
+  private async executeJob(): Promise<void> {
+    const job = this.findNextJobToRun();
+    if (!job) return;
+    try {
+      await this.preRunJob(job);
+      job.moveToRunningJobs();
+      await job.run();
+      job.finalize();
+    } catch (err) {
+      job.moveToFailedJobs();
+    } finally {
+      await this.postRunJob(job);
+    }
   }
 
   private async preRunJob(job: IJob): Promise<Scheduler4Js> {
@@ -123,14 +141,13 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
       { disabled: true, disabledAt: new Date() },
       { where: { id: job.id } }
     );
+    this.context.removeDefinition(job.name);
     return true;
   }
 
-  private async findNextJobToRun(): Promise<IJob | null> {
+  private findNextJobToRun(): IJob {
     const jobQueue = this.context.getJobQueue() || [];
-    if (jobQueue.length == 0) {
-      return null;
-    }
+
     const jobDefinitions = this.context.getJobDefinitions() || [];
 
     let index: number = 0;
@@ -169,10 +186,5 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
         },
       }
     );
-  }
-
-  private convertHumanIntervalToFrequency(): number {
-    return (humanInterval(this.config.frequency) ??
-      humanInterval(Scheduler4JsFrequency.ONCE_IN_HALF_MINUTE)) as number;
   }
 }

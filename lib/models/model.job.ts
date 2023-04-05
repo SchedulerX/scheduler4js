@@ -15,6 +15,7 @@ export class JobModel
   type!: string;
   disabled!: boolean;
   nextTickAt!: Date;
+  lastTickAt!: Date;
   lockedAt?: Date | null | undefined;
   priority!: BigInt;
   data?: any;
