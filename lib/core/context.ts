@@ -120,7 +120,7 @@ export class SchedulerContext<Job, JobLog> {
           tz,
         });
         job.lastTickAt = job.nextTickAt;
-        let nextTick = cronTime.next().toDate();
+        const nextTick = cronTime.next().toDate();
         job.nextTickAt = nextTick;
       },
       save: async function (): Promise<JobModel> {

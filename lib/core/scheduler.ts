@@ -132,7 +132,6 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
   }
 
   private async postRunJob(job: IJob): Promise<Scheduler4Js> {
-    job.calculateNextTick();
     this.context.localUnLockJob(job);
     await this.globalUnLockJob(job);
     return this;
