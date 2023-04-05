@@ -82,6 +82,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
         ]): Promise<void> => {
           const job: JobModel = await this.context.getJobRepository().findOne({
             where: {
+              type: this.config.type ?? { [Op.ne]: null },
               name,
               disabled: { [Op.ne]: true },
               [Op.or]: [
@@ -107,6 +108,8 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
       job.moveToRunningJobs();
       await job.run();
       job.finalize();
+      job.calculateNextTick();
+      job.save();
     } catch (err) {
       job.moveToFailedJobs();
     } finally {
@@ -136,11 +139,8 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
   }
 
   public async disableJob(job: JobModel): Promise<boolean> {
-    const jobRepository = this.context.getJobLogRepository();
-    await jobRepository.update(
-      { disabled: true, disabledAt: new Date() },
-      { where: { id: job.id } }
-    );
+    const jobRepository = this.context.getJobRepository();
+    await jobRepository.update({ disabled: true }, { where: { id: job.id } });
     this.context.removeDefinition(job.name);
     return true;
   }

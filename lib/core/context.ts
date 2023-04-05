@@ -3,6 +3,7 @@ import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
 import { IJobDefinition } from "../types/job.definition";
 import { ISchedulerRepository } from "../types/repository";
+import * as parser from "cron-parser";
 
 export class SchedulerContext<Job, JobLog> {
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
@@ -110,7 +111,21 @@ export class SchedulerContext<Job, JobLog> {
           context.jobQueue.splice(index, 1);
         }
       },
-      calculateNextTick: function (): void {},
+      calculateNextTick: function (): void {
+        const expression = this.definition.option.cron!;
+        const tz = this.definition.option.timezone;
+        const currentDate = job.lastTickAt;
+        let cronTime = parser.parseExpression(expression, {
+          currentDate,
+          tz,
+        });
+        job.lastTickAt = job.nextTickAt;
+        let nextTick = cronTime.next().toDate();
+        job.nextTickAt = nextTick;
+      },
+      save: async function (): Promise<JobModel> {
+        return await job.save();
+      },
     });
   }
 }
