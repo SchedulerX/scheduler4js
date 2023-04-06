@@ -4,7 +4,6 @@ import { JobModel } from "../models/model.job";
 import { JobLogModel } from "../models/model.job.log";
 import { IJob } from "../types/job";
 import { IJobDefinition, IJobOption } from "../types/job.definition";
-import { IScheduler } from "../types/scheduler";
 import { SchedulerConfig } from "../types/scheduler.cofig";
 import { SchedulerContext } from "./context";
 import {
@@ -15,8 +14,9 @@ import {
   DEFAULT_TIMEZONE,
 } from "../constants/job.constants";
 import { JobStatus } from "../enums/job.status";
+import { ITaskRunner } from "../types/runner";
 
-export class Scheduler4Js extends EventEmitter implements IScheduler {
+export class TaskRunner extends EventEmitter implements ITaskRunner {
   private context: SchedulerContext;
   private config: SchedulerConfig;
   constructor(context: SchedulerContext, config: SchedulerConfig) {
@@ -29,7 +29,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     setInterval(this.kickOffJobs.bind(this), this.config.frequency);
   }
 
-  async createJob(config: IJobOption): Promise<IScheduler> {
+  async createJob(config: IJobOption): Promise<ITaskRunner> {
     const jobRepository = this.context.getJobRepository();
     const jobDefinitions = this.context.getJobDefinitions();
     let job = await jobRepository.findOne({
@@ -133,7 +133,7 @@ export class Scheduler4Js extends EventEmitter implements IScheduler {
     return false;
   }
 
-  private async postRunJob(job: IJob): Promise<Scheduler4Js> {
+  private async postRunJob(job: IJob): Promise<ITaskRunner> {
     this.context.localUnLockJob(job);
     await this.globalUnLockJob(job);
     return this;

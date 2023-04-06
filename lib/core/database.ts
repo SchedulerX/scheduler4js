@@ -12,6 +12,7 @@ export class Database implements IDatabase {
   private jobTable: typeof JobModel | undefined;
   private jobLogTable: typeof JobLogModel | undefined;
   initJobTable(sequelize: Sequelize): typeof JobModel {
+    if (this.jobTable) return this.jobTable;
     this.jobTable = JobModel.init(
       {
         id: {
@@ -99,6 +100,7 @@ export class Database implements IDatabase {
     return this.jobTable;
   }
   initJobLogTable(sequelize: Sequelize): typeof JobLogModel {
+    if (this.jobLogTable) return this.jobLogTable;
     this.jobLogTable = JobLogModel.init(
       {
         id: {
