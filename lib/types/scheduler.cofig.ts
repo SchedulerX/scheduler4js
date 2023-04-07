@@ -4,4 +4,5 @@ export interface SchedulerConfig {
   frequency: Scheduler4JsFrequency;
   lockLifetime: number;
   type: string;
+  kick: boolean;
 }

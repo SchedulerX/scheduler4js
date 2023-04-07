@@ -39,5 +39,8 @@
     "sequelize": "^6.30.0",
     "sequelize-cli": "^6.4.1",
     "sequelize-typescript": "^2.1.5"
+  },
+  "bugs": {
+    "url": "https://github.com/SchedulerX/scheduler4js/issues"
   }
 }

@@ -1,7 +1,6 @@
 import { Op } from "sequelize";
 import { EventEmitter } from "stream";
 import { JobModel } from "../models/model.job";
-import { JobLogModel } from "../models/model.job.log";
 import { IJob } from "../types/job";
 import { IJobDefinition, IJobOption } from "../types/job.definition";
 import { SchedulerConfig } from "../types/scheduler.cofig";
