@@ -1,13 +1,12 @@
-import { Sequelize } from "sequelize-typescript";
 import { Scheduler, Scheduler4JsFrequency } from "../dist";
 
-const connection = new Sequelize({
+const dbConfig = {
   port: 3452,
   host: localhost,
   user: postgres,
   password: password,
   dialect: "postgres",
-});
+};
 
 const config = {
   frequency: Scheduler4JsFrequency.ONCE_IN_HALF_MINUTE,
@@ -16,7 +15,7 @@ const config = {
   kick: true,
 };
 
-const scheduler = new Scheduler({ connection, config });
+const scheduler = new Scheduler({ dbConfig, config });
 
 scheduler.createJob({
   name: "halil",
@@ -27,6 +26,6 @@ scheduler.createJob({
   lockExpire: 60 * 1000,
   lockLimit: 1,
   fn: () => {
-    console.log("@@@@@@@@@");
+    console.log(`Job run at the time of ${new Date()}`);
   },
 });
