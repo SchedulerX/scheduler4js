@@ -49,7 +49,7 @@ scheduler.createJob({
   lockExpire: 60 * 1000,
   lockLimit: 1,
   fn: () => {
-    console.log("@@@@@@@@@");
+        console.log(`Job run at the time of ${new Date()}`);
   },
 });
 ```
