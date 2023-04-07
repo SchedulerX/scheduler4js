@@ -1,8 +1,7 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes } from "sequelize";
 import { Options } from "sequelize/types";
 import { JobModel } from "../models/model.job";
 import { JobLogModel } from "../models/model.job.log";
-import { ParentModel } from "../models/parent.model";
 import { IDatabase } from "../types/database";
 import { Sequelize } from "sequelize-typescript";
 import { JobStatus } from "../enums/job.status";
@@ -11,8 +10,16 @@ import { DEFAULT_JOB_TYPE } from "../constants/job.constants";
 export class Database implements IDatabase {
   private jobTable: typeof JobModel | undefined;
   private jobLogTable: typeof JobLogModel | undefined;
-  initJobTable(sequelize: Sequelize): typeof JobModel {
-    if (this.jobTable) return this.jobTable;
+  private connection: Sequelize | undefined;
+  private config: Options | undefined;
+  constructor(config: Options) {
+    this.config = config;
+    this.connect();
+    this.initJobTable();
+    this.initJobLogTable();
+  }
+  initJobTable(): Database {
+    if (this.jobTable) return this;
     this.jobTable = JobModel.init(
       {
         id: {
@@ -79,7 +86,7 @@ export class Database implements IDatabase {
       },
       {
         underscored: true,
-        sequelize,
+        sequelize: this.connection!,
         tableName: "jobs",
         schema: "public",
         timestamps: true,
@@ -97,10 +104,11 @@ export class Database implements IDatabase {
         ],
       }
     );
-    return this.jobTable;
+    return this;
   }
-  initJobLogTable(sequelize: Sequelize): typeof JobLogModel {
-    if (this.jobLogTable) return this.jobLogTable;
+
+  initJobLogTable(): Database {
+    if (this.jobLogTable) return this;
     this.jobLogTable = JobLogModel.init(
       {
         id: {
@@ -137,7 +145,7 @@ export class Database implements IDatabase {
       },
       {
         underscored: true,
-        sequelize,
+        sequelize: this.connection!,
         tableName: "job_log",
         schema: "public",
         timestamps: true,
@@ -150,14 +158,18 @@ export class Database implements IDatabase {
         ],
       }
     );
-    return this.jobLogTable;
+    return this;
   }
-  connect(options: Options): Sequelize {
-    return new Sequelize(options);
+
+  public connect(): IDatabase {
+    this.connection = new Sequelize(this.config);
+    return this;
   }
+
   public getJob(): typeof JobModel | undefined {
     return this.jobTable;
   }
+
   public getJobLog(): typeof JobLogModel | undefined {
     return this.jobLogTable;
   }

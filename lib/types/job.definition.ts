@@ -9,6 +9,8 @@ export interface IJobOption {
   lockLimit?: number;
   lockExpire?: number;
   data?: any;
+  saveLog: boolean;
+  priority: number;
   fn: (...args: any[]) => any;
 }
 

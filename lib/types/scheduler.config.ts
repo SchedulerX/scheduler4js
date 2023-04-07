@@ -5,6 +5,4 @@ export interface SchedulerConfig {
   lockLifetime: number;
   type: string;
   kick: boolean;
-  priority: number;
-  saveLog: boolean;
 }
