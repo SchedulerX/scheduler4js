@@ -5,7 +5,10 @@
     "declaration": true,
     "outDir": "./dist",
     "strict": true,
-    "rootDir": "lib"
+    "rootDir": "lib",
+    "declarationMap": true,
+    "sourceMap": true,
+    "allowJs": true
   },
   "include": ["lib"]
 }

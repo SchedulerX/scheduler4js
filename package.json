@@ -1,6 +1,6 @@
 {
   "name": "scheduler4js",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index",
@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "cron-parser": "^4.8.1",
+    "pg": "^8.10.0",
     "sequelize": "^6.30.0",
     "sequelize-cli": "^6.4.1",
     "sequelize-typescript": "^2.1.5"
