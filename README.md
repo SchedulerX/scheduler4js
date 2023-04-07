@@ -19,11 +19,12 @@ The library provides a schedule class that accepts a task function and a config 
 import { Scheduler, Scheduler4JsFrequency } from "../dist";
 
 const dbConfig = {
-  port: 3452,
+  port: 5432,
   host: localhost,
-  user: postgres,
+  username: postgres,
   password: password,
   dialect: "postgres",
+  database: "scheduler4js",
 };
 
 const config = {
