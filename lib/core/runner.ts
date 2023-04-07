@@ -3,7 +3,7 @@ import { EventEmitter } from "stream";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
 import { IJobDefinition, IJobOption } from "../types/job.definition";
-import { SchedulerConfig } from "../types/scheduler.cofig";
+import { SchedulerConfig } from "../types/scheduler.config";
 import { SchedulerContext } from "./context";
 import {
   DEFAULT_CONCURRENCY,

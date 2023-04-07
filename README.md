@@ -16,7 +16,6 @@ The library provides a schedule class that accepts a task function and a config 
 #### Create db connection and library config to create instance of the library:
 
 ```
-import { Sequelize } from "sequelize-typescript";
 import { Scheduler, Scheduler4JsFrequency } from "../dist";
 
 const dbConfig = {
