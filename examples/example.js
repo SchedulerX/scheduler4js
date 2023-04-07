@@ -1,11 +1,12 @@
 import { Scheduler, Scheduler4JsFrequency } from "../dist";
 
 const dbConfig = {
-  port: 3452,
+  port: 5432,
   host: localhost,
-  user: postgres,
+  username: postgres,
   password: password,
   dialect: "postgres",
+  database: "scheduler4js",
 };
 
 const config = {
@@ -17,7 +18,7 @@ const config = {
 
 const scheduler = new Scheduler({ dbConfig, config });
 
-scheduler.createJob({
+await scheduler.createJob({
   name: "halil",
   concurrency: 1,
   type: "x",

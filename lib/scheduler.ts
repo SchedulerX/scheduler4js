@@ -19,7 +19,7 @@ export class Scheduler {
     }
   }
 
-  public createJob(config: IJobOption) {
-    this.runner.createJob(config);
+  public async createJob(config: IJobOption): Promise<void> {
+    await this.runner.createJob(config);
   }
 }

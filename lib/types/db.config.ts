@@ -1,10 +1,11 @@
-import { Dialect } from "sequelize";
+import { Dialect, PoolOptions } from "sequelize";
 
 export interface DbConfig {
-  dbName: string;
+  database: string;
   host: string;
   port: number;
-  user: string;
+  username: string;
   password: string;
   dialect?: Dialect;
+  pool?: PoolOptions;
 }
