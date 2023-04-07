@@ -104,6 +104,7 @@ export class Database implements IDatabase {
         ],
       }
     );
+    this.jobTable.sync();
     return this;
   }
 
@@ -158,6 +159,7 @@ export class Database implements IDatabase {
         ],
       }
     );
+    this.jobLogTable.sync();
     return this;
   }
 

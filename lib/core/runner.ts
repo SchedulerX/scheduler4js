@@ -14,6 +14,7 @@ import {
 } from "../constants/job.constants";
 import { JobStatus } from "../enums/job.status";
 import { ITaskRunner } from "../types/runner";
+import * as parser from "cron-parser";
 
 export class TaskRunner extends EventEmitter implements ITaskRunner {
   private context: SchedulerContext;
@@ -39,6 +40,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
         {
           cron: config.cron,
           data: config.data,
+          nextTick: this.computeNextTick(job),
         },
         { where: { id: job.id } }
       );
@@ -52,6 +54,10 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
         type: config.type ?? DEFAULT_JOB_TYPE,
         priority: 0,
         status: JobStatus.RUNNING,
+        nextTick: this.computeNextTick({
+          cron: config.cron,
+          timezone: config.timezone,
+        }),
       });
     }
     jobDefinitions[config.name] = {
@@ -66,6 +72,14 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
     };
     return this;
+  }
+
+  private computeNextTick(job: Partial<JobModel>): Date {
+    let cronTime = parser.parseExpression(job.cron!, {
+      currentDate: new Date(),
+      tz: job.timezone,
+    });
+    return cronTime.next().toDate();
   }
 
   public async kickOffJobs(): Promise<void> {
