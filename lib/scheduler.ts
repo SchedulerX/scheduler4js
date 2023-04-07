@@ -1,10 +1,8 @@
-import { CronExpression } from "./constants/QSchedulerExpression";
 import { SchedulerContext } from "./core/context";
 import { Database } from "./core/database";
 import { Sequelize } from "sequelize-typescript";
 import { SchedulerConfig } from "./types/scheduler.config";
 import { TaskRunner } from "./core/runner";
-import { IJob } from "./types/job";
 import { IJobOption } from "./types/job.definition";
 import { DbConfig } from "./types/db.config";
 
