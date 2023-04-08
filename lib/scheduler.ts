@@ -3,11 +3,11 @@ import { Database } from "./core/database";
 import { SchedulerConfig } from "./types/scheduler.config";
 import { TaskRunner } from "./core/runner";
 import { IJobOption } from "./types/job.definition";
-import { DbConfig } from "./types/db.config";
+import { Options } from "sequelize";
 
 export class Scheduler {
   private runner: TaskRunner;
-  constructor(params: { dbConfig: DbConfig; config: SchedulerConfig }) {
+  constructor(params: { dbConfig: Options; config: SchedulerConfig }) {
     const { dbConfig, config } = params;
 
     const db = new Database(dbConfig);

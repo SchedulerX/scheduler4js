@@ -15,14 +15,24 @@ The library provides a schedule class that accepts a task function and a config 
 
 #### Create db connection and library config to create instance of the library:
 
+### TS
+
+```
+import { Scheduler, Scheduler4JsFrequency } from 'scheduler4js';
+```
+
+### JS
+
 ```
 const { Scheduler, Scheduler4JsFrequency } = require("scheduler4js");
+```
 
+```
 const dbConfig = {
   port: 5432,
-  host: localhost,
-  username: postgres,
-  password: password,
+  host: "localhost",
+  username: "postgres",
+  password: "password",
   dialect: "postgres",
   database: "scheduler4js",
   logging: false
