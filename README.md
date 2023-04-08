@@ -16,7 +16,7 @@ The library provides a schedule class that accepts a task function and a config 
 #### Create db connection and library config to create instance of the library:
 
 ```
-import { Scheduler, Scheduler4JsFrequency } from "../dist";
+const { Scheduler, Scheduler4JsFrequency } = require("scheduler4js");
 
 const dbConfig = {
   port: 5432,
@@ -54,14 +54,16 @@ scheduler.createJob({
   },
 });
 ```
+
 ### Output:
-````
+
+```
 Job run at the time of Sat Apr 08 2023 08:01:05 GMT+0300 (GMT+03:00)
 Job run at the time of Sat Apr 08 2023 08:02:05 GMT+0300 (GMT+03:00)
 Job run at the time of Sat Apr 08 2023 08:03:05 GMT+0300 (GMT+03:00)
 Job run at the time of Sat Apr 08 2023 08:04:05 GMT+0300 (GMT+03:00)
 Job run at the time of Sat Apr 08 2023 08:05:05 GMT+0300 (GMT+03:00)
-````
+```
 
 ### API
 
@@ -77,4 +79,4 @@ Schedules a task to repeat at the specified date.
 
 ### License
 
-### ISC
+### MIT
