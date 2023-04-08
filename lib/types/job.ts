@@ -8,12 +8,12 @@ export interface IJob {
   incrementSuccessCount(): void;
   removeFromQueue(): void;
   save(): Promise<JobModel>;
-  moveToRunningJobs(): Promise<void>;
-  moveToFailedJobs(): Promise<void>;
+  moveToRunningJobs(): void;
+  handleJobFailure(): void;
   calculateNextTick(): void;
   finalize(): void;
-  changeJobStatus(status: JobStatus): Promise<void>;
+  changeJobStatus(status: JobStatus): void;
   run(): Promise<void>;
   isExpired(): boolean;
-  definition: IJobDefinition;
+  getDefinition(): IJobDefinition;
 }

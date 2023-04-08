@@ -123,7 +123,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
         await job.saveLog();
       }
     } catch (err) {
-      job.moveToFailedJobs();
+      job.handleJobFailure();
       job.incrementFailCount();
       await job.saveLog(err);
     } finally {
@@ -146,7 +146,9 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       }
       return false;
     }
-    console.debug(`Job with name :${job.definition.option.name} cannot locked`);
+    console.debug(
+      `Job with name :${job.getDefinition().option.name} cannot locked`
+    );
     return false;
   }
 
@@ -173,9 +175,9 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     let index: number = 0;
     for (index = jobQueue.length - 1; index > 0; index -= 1) {
       if (
-        jobDefinitions[jobQueue[index].definition.option.name].option
+        jobDefinitions[jobQueue[index].getDefinition().option.name].option
           .concurrency! >
-        jobDefinitions[jobQueue[index].definition.option.name].running!
+        jobDefinitions[jobQueue[index].getDefinition().option.name].running!
       ) {
         break;
       }
@@ -185,12 +187,12 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
 
   private async globalLockJob(job: IJob): Promise<boolean> {
     const now = new Date();
-    job.definition.lockedAt = now;
+    job.getDefinition().lockedAt = now;
     const [count] = await this.context
       .getJobRepository()
       .update(
         { lockedAt: now },
-        { where: { name: job.definition.option.name } }
+        { where: { name: job.getDefinition().option.name } }
       );
     return count > 0;
   }
@@ -200,17 +202,19 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       { lockedAt: null },
       {
         where: {
-          name: job.definition.option.name,
-          lockedAt: job.definition.lockedAt,
+          name: job.getDefinition().option.name,
+          lockedAt: job.getDefinition().lockedAt,
         },
       }
     );
     const globalLockedAt =
-      this.context.getJobDefinitions()[job.definition.option.name].lockedAt;
-    if (globalLockedAt == job.definition.lockedAt) {
-      this.context.getJobDefinitions()[job.definition.option.name].lockedAt =
-        null;
+      this.context.getJobDefinitions()[job.getDefinition().option.name]
+        .lockedAt;
+    if (globalLockedAt == job.getDefinition().lockedAt) {
+      this.context.getJobDefinitions()[
+        job.getDefinition().option.name
+      ].lockedAt = null;
     }
-    job.definition.lockedAt = null;
+    job.getDefinition().lockedAt = null;
   }
 }

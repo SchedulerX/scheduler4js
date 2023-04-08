@@ -1,6 +1,7 @@
 {
+  "author": "Halil Baydar",
   "name": "scheduler4js",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index",
@@ -28,11 +29,9 @@
     "runner",
     "jobs"
   ],
-  "author": "Halil Baydar",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "prettier": "^2.8.7",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^5.0.3"
@@ -40,7 +39,6 @@
   "dependencies": {
     "cron-parser": "^4.8.1",
     "pg": "^8.10.0",
-    "sequelize": "^6.30.0",
     "sequelize-typescript": "^2.1.5"
   },
   "bugs": {
