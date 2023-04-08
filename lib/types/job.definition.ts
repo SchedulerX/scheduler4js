@@ -19,6 +19,6 @@ export interface IJobDefinition {
   status: JobStatus;
   lockExpire: number;
   running?: number;
-  lockedAt?: Date;
+  lockedAt?: Date | null;
   lock?: number;
 }

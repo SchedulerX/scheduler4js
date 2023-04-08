@@ -53,6 +53,12 @@ scheduler.createJob({
   },
 });
 ```
+### Output:
+````
+Job run at the time of Sat Apr 08 2023 08:01:05 GMT+0300 (GMT+03:00)
+Job run at the time of Sat Apr 08 2023 08:02:05 GMT+0300 (GMT+03:00)
+Job run at the time of Sat Apr 08 2023 08:03:05 GMT+0300 (GMT+03:00)
+````
 
 ### API
 

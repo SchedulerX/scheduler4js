@@ -201,5 +201,12 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
         },
       }
     );
+    const globalLockedAt =
+      this.context.getJobDefinitions()[job.definition.option.name].lockedAt;
+    if (globalLockedAt == job.definition.lockedAt) {
+      this.context.getJobDefinitions()[job.definition.option.name].lockedAt =
+        null;
+    }
+    job.definition.lockedAt = null;
   }
 }
