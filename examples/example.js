@@ -1,4 +1,4 @@
-const { Scheduler, Scheduler4JsFrequency } = require("scheduler4js");
+const { Scheduler, Scheduler4JsFrequency, CronUtil } = require("scheduler4js");
 
 const dbConfig = {
   port: 5432,
@@ -24,7 +24,7 @@ scheduler.createJob({
   concurrency: 1,
   type: "x",
   timezone: "Asia/Dubai",
-  cron: "0 */1 * * * *",
+  cron: CronUtil.EVERY_X_MINUTE(1),
   lockExpire: 60 * 1000,
   lockLimit: 1,
   fn: () => {

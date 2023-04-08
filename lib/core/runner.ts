@@ -54,7 +54,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
         type: config.type ?? DEFAULT_JOB_TYPE,
         priority: 0,
         status: JobStatus.RUNNING,
-        nextTick: this.computeNextTick({
+        nextTickAt: this.computeNextTick({
           cron: config.cron,
           timezone: config.timezone,
         }),
