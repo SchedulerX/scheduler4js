@@ -17,7 +17,7 @@ const config = {
   kick: true,
 };
 
-const scheduler = new Scheduler({ dbConfig, config });
+const scheduler = new Scheduler({ dbConfig: dbConfig, config });
 
 scheduler.createJob({
   name: "halil",
@@ -30,4 +30,6 @@ scheduler.createJob({
   fn: () => {
     console.log(`Job run at the time of ${new Date()}`);
   },
+  saveLog: false,
+  priority: 0,
 });

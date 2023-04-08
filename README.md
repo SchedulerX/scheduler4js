@@ -59,6 +59,8 @@ scheduler.createJob({
   cron: "0 */1 * * * *",
   lockExpire: 60 * 1000,
   lockLimit: 1,
+  saveLog: false,
+  priority: 0,
   fn: () => {
         console.log(`Job run at the time of ${new Date()}`);
   },
