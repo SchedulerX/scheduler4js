@@ -3,6 +3,7 @@ import { JobModel } from "../models/model.job";
 import { IJobDefinition } from "./job.definition";
 
 export interface IJob {
+  saveLog(err?: any): Promise<void>;
   incrementFailCount(): void;
   incrementSuccessCount(): void;
   removeFromQueue(): void;

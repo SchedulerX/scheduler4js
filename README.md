@@ -18,13 +18,13 @@ The library provides a schedule class that accepts a task function and a config 
 ### TS
 
 ```
-import { Scheduler, Scheduler4JsFrequency } from 'scheduler4js';
+import { Scheduler, Scheduler4JsFrequency, CronUtil } from 'scheduler4js';
 ```
 
 ### JS
 
 ```
-const { Scheduler, Scheduler4JsFrequency } = require("scheduler4js");
+const { Scheduler, Scheduler4JsFrequency, CronUtil } = require("scheduler4js");
 ```
 
 ```
@@ -56,7 +56,7 @@ scheduler.createJob({
   concurrency: 1,
   type: "x",
   timezone: "Asia/Dubai",
-  cron: "0 */1 * * * *",
+  cron: CronUtil.EVERY_X_MINUTE(1),
   lockExpire: 60 * 1000,
   lockLimit: 1,
   saveLog: false,

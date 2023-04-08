@@ -6,6 +6,7 @@ import { IJobDefinition } from "../types/job.definition";
 import * as parser from "cron-parser";
 import { JobLogModel } from "../models/model.job.log";
 import { IDatabase } from "../types/database";
+import { Status } from "../types/job.log.entity.attributes";
 
 export class SchedulerContext {
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
@@ -135,10 +136,20 @@ export class SchedulerContext {
         }
       },
       incrementFailCount: function (): void {
-        job.failCount = (job.failCount || 0 + 1) as bigint;
+        job.failCount = (((job.failCount as any) || 0) + 1) as bigint;
       },
       incrementSuccessCount: function (): void {
-        job.successCount = (job.successCount || 0 + 1) as bigint;
+        job.successCount = ((job.successCount as any) || 0) + 1;
+      },
+      saveLog: async function (err?: any): Promise<void> {
+        await context.getJobLogRepository().create<any>({
+          jobName: job.name,
+          jobId: job.id,
+          jobTime: new Date(),
+          job: this.definition,
+          resultStatus: err ? Status.ERROR : Status.SUCCESS,
+          failReason: err ?? null,
+        });
       },
     });
   }

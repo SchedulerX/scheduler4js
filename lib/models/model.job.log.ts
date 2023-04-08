@@ -16,7 +16,6 @@ export class JobLogModel
   resultStatus!: string;
   failReason?: string | null;
   disabledAt?: Date | null;
-  disabled?: boolean | null;
   createdAt!: Date;
   updatedAt?: Date;
 }
