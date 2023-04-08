@@ -1,6 +1,6 @@
 {
   "name": "scheduler4js",
-  "version": "1.0.10",
+  "version": "1.0.13",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index",
@@ -9,7 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "format": "prettier --write \"lib/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "release": "npm run build & npm publish"
   },
   "files": [
     "dist/**/*"

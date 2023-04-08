@@ -36,11 +36,11 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       where: { name: config.name, disabled: { [Op.ne]: true } },
     });
     if (job) {
-      await jobRepository.update<any>(
+      await jobRepository.update(
         {
           cron: config.cron,
           data: config.data,
-          nextTick: this.computeNextTick(job),
+          nextTickAt: this.computeNextTick(job),
         },
         { where: { id: job.id } }
       );
