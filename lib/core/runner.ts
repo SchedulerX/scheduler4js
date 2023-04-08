@@ -180,26 +180,24 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
   }
 
   private async globalLockJob(job: IJob): Promise<boolean> {
-    const now = new Date().toUTCString();
+    const now = new Date();
+    job.definition.lockedAt = now;
     const [count] = await this.context
       .getJobRepository()
       .update(
-        { lockedAt: new Date(now) },
+        { lockedAt: now },
         { where: { name: job.definition.option.name } }
       );
     return count > 0;
   }
 
   private async globalUnLockJob(job: IJob): Promise<void> {
-    const lockDeadline = new Date(
-      Date.now().valueOf() - this.config.lockLifetime
-    ).toUTCString();
     await this.context.getJobRepository().update(
       { lockedAt: null },
       {
         where: {
           name: job.definition.option.name,
-          lockedAt: { [Op.lte]: lockDeadline },
+          lockedAt: job.definition.lockedAt,
         },
       }
     );
