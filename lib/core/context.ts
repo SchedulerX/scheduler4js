@@ -134,6 +134,12 @@ export class SchedulerContext {
           context.jobQueue.splice(index, 1);
         }
       },
+      incrementFailCount: function (): void {
+        job.failCount = (job.failCount || 0 + 1) as bigint;
+      },
+      incrementSuccessCount: function (): void {
+        job.successCount = (job.successCount || 0 + 1) as bigint;
+      },
     });
   }
 }

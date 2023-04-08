@@ -119,13 +119,15 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       if (await this.preRunJob(job)) {
         job.moveToRunningJobs();
         await job.run();
-        job.finalize();
-        job.calculateNextTick();
-        job.save();
+        job.incrementSuccessCount();
       }
     } catch (err) {
       job.moveToFailedJobs();
+      job.incrementFailCount();
     } finally {
+      job.finalize();
+      job.calculateNextTick();
+      job.save();
       await this.postRunJob(job);
     }
   }
