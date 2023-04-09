@@ -18,7 +18,7 @@ The library provides a schedule class that accepts a task function and a config 
 ### TS
 
 ```
-import { Scheduler, Scheduler4JsFrequency, CronUtil } from 'scheduler4js';
+import { Scheduler, Frequency, CronUtil } from 'scheduler4js';
 ```
 
 ### JS
