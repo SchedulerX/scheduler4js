@@ -16,6 +16,10 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     this.context = context;
     this.config = config;
   }
+  dequeueJob(name: string): ITaskRunner {
+    this.context.dequeueJob(name);
+    return this;
+  }
 
   public tick(): void {
     setInterval(this.kickOffJobs.bind(this), this.config.frequency);

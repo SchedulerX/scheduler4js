@@ -1,7 +1,7 @@
-import { Scheduler4JsFrequency } from "../enums/frequency";
+import { Frequency } from "../enums/frequency";
 
 export interface SchedulerConfig {
-  frequency: Scheduler4JsFrequency;
+  frequency: Frequency;
   lockLifetime: number;
   type: string;
   kick: boolean;

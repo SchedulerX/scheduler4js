@@ -63,6 +63,10 @@ export class SchedulerContext {
     delete this.jobDefinitions[name];
   }
 
+  dequeueJob(name: string) {
+    this.removeDefinition(name);
+  }
+
   public localLockJob(job: IJob): boolean {
     const jobDefinitions = this.getJobDefinitions();
     if (

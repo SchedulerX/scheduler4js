@@ -4,9 +4,10 @@ import { SchedulerConfig } from "./types/scheduler.config";
 import { TaskRunner } from "./core/runner";
 import { IJobOption } from "./types/job.definition";
 import { Options } from "sequelize";
+import { ITaskRunner } from "./types/runner";
 
 export class Scheduler {
-  private runner: TaskRunner;
+  private runner: ITaskRunner;
   constructor(params: { dbConfig: Options; config: SchedulerConfig }) {
     const { dbConfig, config } = params;
 
@@ -21,5 +22,9 @@ export class Scheduler {
 
   public async enqueueJob(config: IJobOption): Promise<void> {
     await this.runner.enqueueJob(config);
+  }
+
+  public dequeueJob(name: string): void {
+    this.runner.dequeueJob(name);
   }
 }

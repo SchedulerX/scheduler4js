@@ -24,7 +24,7 @@ import { Scheduler, Scheduler4JsFrequency, CronUtil } from 'scheduler4js';
 ### JS
 
 ```
-const { Scheduler, Scheduler4JsFrequency, CronUtil } = require("scheduler4js");
+const { Scheduler, Frequency, CronUtil } = require("scheduler4js");
 ```
 
 ```
@@ -39,7 +39,7 @@ const dbConfig = {
 };
 
 const config = {
-  frequency: Scheduler4JsFrequency.ONCE_IN_HALF_MINUTE,
+  frequency: Frequency.ONCE_IN_HALF_MINUTE,
   lockLifetime: 6 * 1000,
   type: "x",
   kick: true,
