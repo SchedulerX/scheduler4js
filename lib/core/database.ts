@@ -138,6 +138,10 @@ export class Database implements IDatabase {
           type: DataTypes.STRING,
           allowNull: false,
         },
+        error: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
         createdAt: {
           type: DataTypes.DATE,
           allowNull: false,
