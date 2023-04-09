@@ -23,13 +23,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     super();
     this.context = context;
     this.config = config;
-
-    if (this.config.loadDynamicallyJobs) {
-      this.loadDynamicallyJobs();
-    }
   }
-
-  async loadDynamicallyJobs(): Promise<void> {}
 
   public tick(): void {
     setInterval(this.kickOffJobs.bind(this), this.config.frequency);
@@ -78,6 +72,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
         ...config,
         concurrency: config.concurrency || DEFAULT_CONCURRENCY,
         lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
+        type: config.type || DEFAULT_JOB_TYPE,
       },
       status: JobStatus.WAITING,
       lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
@@ -96,28 +91,33 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     const jobDefinitions = this.context.getJobDefinitions();
     const lockExpire = new Date(Date.now() - this.config.lockLifetime);
     await Promise.all(
-      Object.entries(jobDefinitions).map(
-        async ([name, jobDefinition]: [
-          name: string,
-          jobDefinition: IJobDefinition
-        ]): Promise<void> => {
-          const job = await this.context.getJobRepository().findOne({
-            where: {
-              type: this.config.type ?? { [Op.ne]: null },
-              name,
-              disabled: { [Op.ne]: true },
-              [Op.or]: [
-                { lockedAt: null, nextTickAt: { [Op.lte]: new Date() } },
-                { lockedAt: { [Op.lte]: lockExpire } },
-              ],
-            },
-          });
-          if (job) {
-            this.context.injectJob(job);
-            await this.executeJob();
+      Object.entries(jobDefinitions)
+        .filter(
+          ([name, def]) =>
+            def.option.type === (this.config.type || DEFAULT_JOB_TYPE)
+        )
+        .map(
+          async ([name, def]: [
+            name: string,
+            jobDefinition: IJobDefinition
+          ]): Promise<void> => {
+            const job = await this.context.getJobRepository().findOne({
+              where: {
+                type: this.config.type ?? { [Op.ne]: null },
+                name,
+                disabled: { [Op.ne]: true },
+                [Op.or]: [
+                  { lockedAt: null, nextTickAt: { [Op.lte]: new Date() } },
+                  { lockedAt: { [Op.lte]: lockExpire } },
+                ],
+              },
+            });
+            if (job) {
+              this.context.injectJob(job);
+              await this.executeJob();
+            }
           }
-        }
-      )
+        )
     );
   }
 
