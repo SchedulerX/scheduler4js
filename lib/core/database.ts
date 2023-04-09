@@ -15,10 +15,10 @@ export class Database implements IDatabase {
   constructor(config: Options) {
     this.config = config;
     this.connect();
-    this.initJobTable();
     this.initJobLogTable();
+    this.initJobTable();
   }
-  initJobTable(): Database {
+  async initJobTable(): Promise<Database> {
     if (this.jobTable) return this;
     this.jobTable = JobModel.init(
       {
@@ -104,11 +104,11 @@ export class Database implements IDatabase {
         ],
       }
     );
-    this.jobTable.sync();
+    await this.jobTable.sync();
     return this;
   }
 
-  initJobLogTable(): Database {
+  async initJobLogTable(): Promise<Database> {
     if (this.jobLogTable) return this;
     this.jobLogTable = JobLogModel.init(
       {
@@ -159,7 +159,7 @@ export class Database implements IDatabase {
         ],
       }
     );
-    this.jobLogTable.sync();
+    await this.jobLogTable.sync();
     return this;
   }
 

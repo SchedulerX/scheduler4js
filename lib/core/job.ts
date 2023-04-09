@@ -37,9 +37,9 @@ export class Job implements IJob {
         jobName: this.jobModel.name,
         jobId: this.jobModel.id,
         jobTime: new Date(),
-        job: this.definition,
+        job: this.definition as any,
         resultStatus: err ? Status.ERROR : Status.SUCCESS,
-        failReason: err ?? null,
+        error: err ?? null,
       });
     }
   }
@@ -102,9 +102,8 @@ export class Job implements IJob {
   isExpired(): boolean {
     const lockDeadline = new Date(Date.now() - this.definition.lockExpire);
     return (
-      (this.context.getJobDefinitions()[
-        this.context.getJobDefinitions()[this.jobModel.name].option.name
-      ].lockedAt || Date.now()) < lockDeadline
+      (this.context.getJobDefinitions()[this.jobModel.name].lockedAt ||
+        Date.now()) < lockDeadline
     );
   }
 }
