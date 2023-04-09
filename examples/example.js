@@ -17,7 +17,7 @@ const config = {
   kick: true,
 };
 
-const scheduler = Scheduler.build({ dbConfig: dbConfig, config });
+const scheduler = new Scheduler({ dbConfig: dbConfig, config });
 
 scheduler.enqueueJob({
   name: "halil",
