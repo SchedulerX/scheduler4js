@@ -1,10 +1,21 @@
 import { Model } from "sequelize";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
-import { IJobDefinition } from "../types/job.definition";
+import { IJobDefinition, IJobOption } from "../types/job.definition";
 import { JobLogModel } from "../models/model.job.log";
 import { IDatabase } from "../types/database";
 import { Job } from "./job";
+import {
+  DEFAULT_CONCURRENCY,
+  DEFAULT_JOB_TYPE,
+  DEFAULT_LOCK_EXPIRE,
+  DEFAULT_LOCK_LIMIT,
+  DEFAULT_PRIORITY,
+  DEFAULT_TIMEZONE,
+} from "../constants/job.constants";
+import { JobStatus } from "../enums/job.status";
+import { Op } from "sequelize";
+import * as parser from "cron-parser";
 
 export class SchedulerContext {
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
@@ -79,5 +90,62 @@ export class SchedulerContext {
   public injectJob(job: JobModel): void {
     const jobInstance = new Job(this, job);
     this.jobQueue.push(jobInstance);
+  }
+
+  async enqueueJob(config: IJobOption): Promise<void> {
+    let job = await this.getJobRepository().findOne({
+      where: { name: config.name, disabled: { [Op.ne]: true } },
+    });
+    const payload = {
+      cron: config.cron,
+      data: config.data,
+      disabled: false,
+      timezone: config.timezone || DEFAULT_TIMEZONE,
+      type: config.type || DEFAULT_JOB_TYPE,
+      priority: config.priority || DEFAULT_PRIORITY,
+      status: JobStatus.RUNNING,
+    };
+    if (job) {
+      await this.getJobRepository().update(
+        {
+          ...payload,
+          nextTickAt: this.computeNextTick(job),
+        },
+        { where: { id: job.id } }
+      );
+    } else {
+      job = await this.getJobRepository().create<any>({
+        ...payload,
+        name: config.name,
+        nextTickAt: this.computeNextTick({
+          cron: config.cron,
+          timezone: config.timezone,
+        }),
+      });
+    }
+    this.createJobDefinition(config);
+  }
+
+  private computeNextTick(job: Partial<JobModel>): Date {
+    let cronTime = parser.parseExpression(job.cron!, {
+      currentDate: new Date(),
+      tz: job.timezone,
+    });
+    return cronTime.next().toDate();
+  }
+
+  createJobDefinition(config: IJobOption): void {
+    this.jobDefinitions[config.name] = {
+      running: 0,
+      lock: 0,
+      option: {
+        ...config,
+        concurrency: config.concurrency || DEFAULT_CONCURRENCY,
+        lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
+        type: config.type || DEFAULT_JOB_TYPE,
+      },
+      status: JobStatus.WAITING,
+      lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
+    };
   }
 }

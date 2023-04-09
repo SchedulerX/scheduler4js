@@ -19,7 +19,7 @@ export class Scheduler {
     }
   }
 
-  public async createJob(config: IJobOption): Promise<void> {
-    await this.runner.createJob(config);
+  public async enqueueJob(config: IJobOption): Promise<void> {
+    await this.runner.enqueueJob(config);
   }
 }

@@ -5,17 +5,8 @@ import { IJob } from "../types/job";
 import { IJobDefinition, IJobOption } from "../types/job.definition";
 import { SchedulerConfig } from "../types/scheduler.config";
 import { SchedulerContext } from "./context";
-import {
-  DEFAULT_CONCURRENCY,
-  DEFAULT_JOB_TYPE,
-  DEFAULT_LOCK_EXPIRE,
-  DEFAULT_LOCK_LIMIT,
-  DEFAULT_PRIORITY,
-  DEFAULT_TIMEZONE,
-} from "../constants/job.constants";
-import { JobStatus } from "../enums/job.status";
+import { DEFAULT_JOB_TYPE } from "../constants/job.constants";
 import { ITaskRunner } from "../types/runner";
-import * as parser from "cron-parser";
 
 export class TaskRunner extends EventEmitter implements ITaskRunner {
   private context: SchedulerContext;
@@ -30,64 +21,9 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     setInterval(this.kickOffJobs.bind(this), this.config.frequency);
   }
 
-  async createJob(config: IJobOption): Promise<ITaskRunner> {
-    const jobRepository = this.context.getJobRepository();
-    let job = await jobRepository.findOne({
-      where: { name: config.name, disabled: { [Op.ne]: true } },
-    });
-    const payload = {
-      cron: config.cron,
-      data: config.data,
-      disabled: false,
-      timezone: config.timezone || DEFAULT_TIMEZONE,
-      type: config.type || DEFAULT_JOB_TYPE,
-      priority: config.priority || DEFAULT_PRIORITY,
-      status: JobStatus.RUNNING,
-    };
-    if (job) {
-      await jobRepository.update(
-        {
-          ...payload,
-          nextTickAt: this.computeNextTick(job),
-        },
-        { where: { id: job.id } }
-      );
-    } else {
-      job = await jobRepository.create<any>({
-        ...payload,
-        name: config.name,
-        nextTickAt: this.computeNextTick({
-          cron: config.cron,
-          timezone: config.timezone,
-        }),
-      });
-    }
-    this.createJobDefinition(config);
+  async enqueueJob(config: IJobOption): Promise<ITaskRunner> {
+    this.context.enqueueJob(config);
     return this;
-  }
-
-  createJobDefinition(config: IJobOption): void {
-    const jobDefinitions = this.context.getJobDefinitions();
-    jobDefinitions[config.name] = {
-      running: 0,
-      lock: 0,
-      option: {
-        ...config,
-        concurrency: config.concurrency || DEFAULT_CONCURRENCY,
-        lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
-        type: config.type || DEFAULT_JOB_TYPE,
-      },
-      status: JobStatus.WAITING,
-      lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
-    };
-  }
-
-  private computeNextTick(job: Partial<JobModel>): Date {
-    let cronTime = parser.parseExpression(job.cron!, {
-      currentDate: new Date(),
-      tz: job.timezone,
-    });
-    return cronTime.next().toDate();
   }
 
   public async kickOffJobs(): Promise<void> {
@@ -97,6 +33,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       Object.entries(jobDefinitions)
         .filter(
           ([name, def]) =>
+            !def.option.type ||
             def.option.type === (this.config.type || DEFAULT_JOB_TYPE)
         )
         .map(

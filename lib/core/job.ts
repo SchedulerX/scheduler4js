@@ -19,14 +19,16 @@ export class Job implements IJob {
     return this.definition;
   }
   async saveLog(err?: any): Promise<void> {
-    await this.context.getJobLogRepository().create<any>({
-      jobName: this.jobModel.name,
-      jobId: this.jobModel.id,
-      jobTime: new Date(),
-      job: this.definition,
-      resultStatus: err ? Status.ERROR : Status.SUCCESS,
-      failReason: err ?? null,
-    });
+    if (this.definition.option.saveLog) {
+      await this.context.getJobLogRepository().create<any>({
+        jobName: this.jobModel.name,
+        jobId: this.jobModel.id,
+        jobTime: new Date(),
+        job: this.definition,
+        resultStatus: err ? Status.ERROR : Status.SUCCESS,
+        failReason: err ?? null,
+      });
+    }
   }
   incrementFailCount(): void {
     this.jobModel.failCount = (Number(this.jobModel.failCount || 0) + 1) as any;
