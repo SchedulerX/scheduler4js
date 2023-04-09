@@ -29,12 +29,11 @@ export class Job implements IJob {
     });
   }
   incrementFailCount(): void {
-    this.jobModel.failCount = (((this.jobModel.failCount || 0) as number) +
-      1) as unknown as bigint;
+    this.jobModel.failCount = (Number(this.jobModel.failCount || 0) + 1) as any;
   }
   incrementSuccessCount(): void {
-    this.jobModel.successCount = (((this.jobModel.successCount ||
-      0) as number) + 1) as unknown as bigint;
+    this.jobModel.successCount = (Number(this.jobModel.successCount || 0) +
+      1) as any;
   }
   removeFromQueue(): void {
     const index = this.context.getJobQueue().indexOf(this);
