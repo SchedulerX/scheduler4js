@@ -15,9 +15,8 @@ export class Database implements IDatabase {
   constructor(config: Options) {
     this.config = config;
     this.connect();
-    this.initJobLogTable();
-    this.initJobTable();
   }
+
   async initJobTable(): Promise<Database> {
     if (this.jobTable) return this;
     this.jobTable = JobModel.init(

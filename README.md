@@ -45,7 +45,7 @@ const config = {
   kick: true,
 };
 
-const scheduler = new Scheduler({ dbConfig, config });
+const scheduler = Scheduler.build({ dbConfig: dbConfig, config });
 ```
 
 ### Create a job:

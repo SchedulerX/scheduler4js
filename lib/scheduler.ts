@@ -7,24 +7,36 @@ import { Options } from "sequelize";
 import { ITaskRunner } from "./types/runner";
 
 export class Scheduler {
-  private runner: ITaskRunner;
-  constructor(params: { dbConfig: Options; config: SchedulerConfig }) {
+  private runner: ITaskRunner | undefined;
+  private constructor() {}
+
+  public static async build(params: {
+    dbConfig: Options;
+    config: SchedulerConfig;
+  }): Promise<Scheduler> {
+    const scheduler = new Scheduler();
+
     const { dbConfig, config } = params;
 
     const db = new Database(dbConfig);
+    await db.initJobLogTable();
+    await db.initJobTable();
+
     const context = new SchedulerContext(db);
-    this.runner = new TaskRunner(context, config);
+    scheduler.runner = new TaskRunner(context, config);
 
     if (config.kick) {
-      this.runner.tick();
+      scheduler.runner.tick();
     }
+
+    return scheduler;
   }
 
   public async enqueueJob(config: IJobOption): Promise<void> {
-    await this.runner.enqueueJob(config);
+    await this.runner!.enqueueJob(config);
   }
 
   public dequeueJob(name: string): void {
-    this.runner.dequeueJob(name);
+    this.runner!.dequeueJob(name);
   }
 }
