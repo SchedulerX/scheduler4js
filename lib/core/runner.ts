@@ -10,6 +10,7 @@ import {
   DEFAULT_JOB_TYPE,
   DEFAULT_LOCK_EXPIRE,
   DEFAULT_LOCK_LIMIT,
+  DEFAULT_PRIORITY,
   DEFAULT_TIMEZONE,
 } from "../constants/job.constants";
 import { JobStatus } from "../enums/job.status";
@@ -34,25 +35,27 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     let job = await jobRepository.findOne({
       where: { name: config.name, disabled: { [Op.ne]: true } },
     });
+    const payload = {
+      cron: config.cron,
+      data: config.data,
+      disabled: false,
+      timezone: config.timezone || DEFAULT_TIMEZONE,
+      type: config.type || DEFAULT_JOB_TYPE,
+      priority: config.priority || DEFAULT_PRIORITY,
+      status: JobStatus.RUNNING,
+    };
     if (job) {
       await jobRepository.update(
         {
-          context: {},
-          cron: config.cron,
-          data: config.data,
+          ...payload,
           nextTickAt: this.computeNextTick(job),
         },
         { where: { id: job.id } }
       );
     } else {
       job = await jobRepository.create<any>({
+        ...payload,
         name: config.name,
-        disabled: false,
-        cron: config.cron,
-        timezone: config.timezone || DEFAULT_TIMEZONE,
-        type: config.type ?? DEFAULT_JOB_TYPE,
-        priority: 0,
-        status: JobStatus.RUNNING,
         nextTickAt: this.computeNextTick({
           cron: config.cron,
           timezone: config.timezone,
