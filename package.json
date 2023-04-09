@@ -1,7 +1,7 @@
 {
   "author": "Halil Baydar",
   "name": "scheduler4js",
-  "version": "1.0.27",
+  "version": "1.0.29",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index",
@@ -38,7 +38,6 @@
   },
   "dependencies": {
     "cron-parser": "^4.8.1",
-    "pg": "^8.10.0",
     "sequelize-typescript": "^2.1.5"
   },
   "bugs": {
