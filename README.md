@@ -1,7 +1,7 @@
 ### Scheduler4js
 
-Scheduler4js is a lightweight library for scheduling tasks in Node.js.
-This library makes easier to create cron jobs, running on sql database, dynamically from client side.
+Scheduler4js is a library for scheduling tasks in Node.JS.
+This library makes easier to dynamically create cron jobs running on sql database from client side.
 
 ### Installation
 
