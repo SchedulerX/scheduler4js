@@ -8,19 +8,22 @@ import { ITaskRunner } from "./types/runner";
 
 export class Scheduler {
   private runner: ITaskRunner | undefined;
-  constructor(params: { dbConfig: Options; config: SchedulerConfig }) {
-    const { dbConfig, config } = params;
-    (async () => {
-      const db = new Database(dbConfig);
-      await db.initJobLogTable();
-      await db.initJobTable();
-      const context = new SchedulerContext(db);
-      this.runner = new TaskRunner(context, config);
+  constructor() {}
 
-      if (config.kick) {
-        this.runner.tick();
-      }
-    })();
+  async init(params: {
+    dbConfig: Options;
+    config: SchedulerConfig;
+  }): Promise<void> {
+    const { dbConfig, config } = params;
+    const db = new Database(dbConfig);
+    await db.initJobTable();
+    await db.initJobLogTable();
+    const context = new SchedulerContext(db);
+    this.runner = new TaskRunner(context, config);
+
+    if (config.kick) {
+      this.runner.tick();
+    }
   }
 
   public async enqueueJob(config: IJobOption): Promise<void> {
