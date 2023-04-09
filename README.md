@@ -51,7 +51,7 @@ const scheduler = new Scheduler({ dbConfig, config });
 ### Create a job:
 
 ```
-scheduler.createJob({
+scheduler.enqueueJob({
   name: "halil",
   concurrency: 1,
   type: "x",
