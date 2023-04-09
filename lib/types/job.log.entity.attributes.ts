@@ -14,10 +14,10 @@ export interface JobLogEntityAttributes {
   jobTime: Date;
   job: JSON;
   resultStatus: JobResultStatus;
-  error?: string | null;
   disabled?: boolean | null;
   createdAt: Date;
   updatedAt?: Date;
+  error?: string;
 }
 
 export type JobLogEntityOptionalAttributes = "error" | "disabled";

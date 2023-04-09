@@ -8,7 +8,6 @@ import * as parser from "cron-parser";
 
 //eslint-disable-next-line @typescript-eslint/no-var-requires
 const moment = require("moment");
-
 export class Job implements IJob {
   private context;
   private definition;

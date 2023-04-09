@@ -14,7 +14,7 @@ export class JobLogModel
   jobTime!: Date;
   job!: JSON;
   resultStatus!: string;
-  failReason?: string | null;
+  error?: string;
   disabledAt?: Date | null;
   createdAt!: Date;
   updatedAt?: Date;
