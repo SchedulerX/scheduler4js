@@ -6,6 +6,9 @@ import { Status } from "../types/job.log.entity.attributes";
 import { SchedulerContext } from "./context";
 import * as parser from "cron-parser";
 
+//eslint-disable-next-line @typescript-eslint/no-var-requires
+const moment = require("moment");
+
 export class Job implements IJob {
   private context;
   private definition;
@@ -15,6 +18,16 @@ export class Job implements IJob {
     this.jobModel = jobModel;
     this.definition = this.context.getJobDefinitions()[jobModel.name];
   }
+
+  shouldRun(): boolean {
+    const now = new Date();
+    const currentTime = moment(now).tz(this.jobModel.timezone);
+    const nextTickAt = moment(this.jobModel.lastTickAt || now).tz(
+      this.jobModel.timezone
+    );
+    return nextTickAt.isSameOrBefore(currentTime);
+  }
+
   getDefinition(): IJobDefinition {
     return this.definition;
   }

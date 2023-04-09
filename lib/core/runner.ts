@@ -89,16 +89,18 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
   }
 
   private async preRunJob(job: IJob): Promise<boolean> {
-    if (this.context.localLockJob(job)) {
-      try {
-        if (await this.globalLockJob(job)) {
-          return true;
+    if (job.shouldRun()) {
+      if (this.context.localLockJob(job)) {
+        try {
+          if (await this.globalLockJob(job)) {
+            return true;
+          }
+        } catch (err) {
+          console.debug(`Error while locking job, message: ${err}`);
+          this.context.localUnLockJob(job);
         }
-      } catch (err) {
-        console.debug(`Error while locking job, message: ${err}`);
-        this.context.localUnLockJob(job);
+        return false;
       }
-      return false;
     }
     console.debug(
       `Job with name :${job.getDefinition().option.name} cannot locked`
