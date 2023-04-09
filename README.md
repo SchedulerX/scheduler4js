@@ -85,7 +85,7 @@ Schedules a task to repeat at the specified date.
 - concurrency: The concurrency of the job
 - type: The type of the job which shows which executor should execute the given job
 - lockExpire: It shows locking life time of the given job
-- lockLimit: IT shows the number of lock limit
+- lockLimit: It shows the number of lock limit
 - fn - A function to run when the scheduled time arrives.
 - cron - It's cron expression representing the time to run the task again and again.
 

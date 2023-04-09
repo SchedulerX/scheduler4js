@@ -23,7 +23,13 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     super();
     this.context = context;
     this.config = config;
+
+    if (this.config.loadDynamicallyJobs) {
+      this.loadDynamicallyJobs();
+    }
   }
+
+  async loadDynamicallyJobs(): Promise<void> {}
 
   public tick(): void {
     setInterval(this.kickOffJobs.bind(this), this.config.frequency);
@@ -31,13 +37,13 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
 
   async createJob(config: IJobOption): Promise<ITaskRunner> {
     const jobRepository = this.context.getJobRepository();
-    const jobDefinitions = this.context.getJobDefinitions();
     let job = await jobRepository.findOne({
       where: { name: config.name, disabled: { [Op.ne]: true } },
     });
     if (job) {
       await jobRepository.update(
         {
+          context: {},
           cron: config.cron,
           data: config.data,
           nextTickAt: this.computeNextTick(job),
@@ -47,7 +53,6 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     } else {
       job = await jobRepository.create<any>({
         name: config.name,
-        data: config.data,
         disabled: false,
         cron: config.cron,
         timezone: config.timezone || DEFAULT_TIMEZONE,
@@ -60,6 +65,12 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
         }),
       });
     }
+    this.createJobDefinition(config);
+    return this;
+  }
+
+  createJobDefinition(config: IJobOption): void {
+    const jobDefinitions = this.context.getJobDefinitions();
     jobDefinitions[config.name] = {
       running: 0,
       lock: 0,
@@ -71,7 +82,6 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       status: JobStatus.WAITING,
       lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
     };
-    return this;
   }
 
   private computeNextTick(job: Partial<JobModel>): Date {

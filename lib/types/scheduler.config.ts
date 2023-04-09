@@ -5,4 +5,5 @@ export interface SchedulerConfig {
   lockLifetime: number;
   type: string;
   kick: boolean;
+  loadDynamicallyJobs?: boolean;
 }

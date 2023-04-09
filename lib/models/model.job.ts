@@ -18,7 +18,6 @@ export class JobModel
   lastTickAt?: Date;
   lockedAt?: Date | null | undefined;
   priority!: number;
-  data?: any;
   cron!: string;
   timezone!: string;
   failCount?: BigInt;
