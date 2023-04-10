@@ -94,12 +94,15 @@ export class Job implements IJob {
       this.context.getJobDefinitions()[this.jobModel.name].option.name
     ].status = status;
     this.definition.status = status;
+    this.jobModel.status = status;
   }
   async run(): Promise<void> {
     await this.definition.option.fn();
   }
   isExpired(): boolean {
-    const lockDeadline = new Date(Date.now() - this.definition.lockExpire);
+    const lockDeadline = new Date(
+      Date.now() - (this.definition.option.lockExpire || 10 * 60 * 1000)
+    );
     return (
       (this.context.getJobDefinitions()[this.jobModel.name].lockedAt ||
         Date.now()) < lockDeadline

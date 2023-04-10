@@ -147,9 +147,9 @@ export class SchedulerContext {
         concurrency: config.concurrency || DEFAULT_CONCURRENCY,
         lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
         type: config.type || DEFAULT_JOB_TYPE,
+        lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
       },
       status: JobStatus.WAITING,
-      lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
     };
   }
 }

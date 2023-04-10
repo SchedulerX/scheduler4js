@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { WEEK_DAYS } from "../enums/week.days";
 import { Time } from "../types/time";
 

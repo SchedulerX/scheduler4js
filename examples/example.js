@@ -1,4 +1,4 @@
-const { Scheduler, Frequency, CronUtil } = require("scheduler4js");
+const { Scheduler, Frequency, Timezone, CronUtil } = require("scheduler4js");
 
 async function example() {
   const dbConfig = {
@@ -25,7 +25,7 @@ async function example() {
     name: "halil",
     concurrency: 1,
     type: "x",
-    timezone: "Asia/Dubai",
+    timezone: Timezone.ASIA_DUBAI,
     cron: CronUtil.EVERY_X_MINUTE(1),
     lockExpire: 60 * 1000,
     lockLimit: 1,

@@ -1,24 +1,55 @@
 import { JobStatus } from "../enums/job.status";
 
+// Define an interface called IJobOption
 export interface IJobOption {
+  // Define a required property called name of type string
   name: string;
+
+  // Define an optional property called type of type string
   type?: string;
+
+  // Define an optional property called timezone of type string
   timezone?: string;
+
+  // Define a required property called cron of type string
   cron: string;
+
+  // Define an optional property called concurrency of type number
   concurrency?: number;
+
+  // Define an optional property called lockLimit of type number
   lockLimit?: number;
+
+  // Define an optional property called lockExpire of type number in ms
   lockExpire?: number;
+
+  // Define an optional property called data of type any
   data?: any;
+
+  // Define a required property called saveLog of type boolean
   saveLog: boolean;
+
+  // Define a required property called priority of type number
   priority: number;
+
+  // Define a required property called fn of type function that takes any number of arguments and returns any type
   fn: (...args: any[]) => any;
 }
 
+// Define an interface called IJobDefinition
 export interface IJobDefinition {
+  // Define a required property called option of type IJobOption
   option: IJobOption;
+
+  // Define a required property called status of type JobStatus
   status: JobStatus;
-  lockExpire: number;
+
+  // Define an optional property called running of type number
   running?: number;
+
+  // Define an optional property called lockedAt of type Date or null
   lockedAt?: Date | null;
+
+  // Define an optional property called lock of type number
   lock?: number;
 }
