@@ -38,7 +38,7 @@ export class Job implements IJob {
         jobTime: new Date(),
         job: this.definition as any,
         resultStatus: err ? Status.ERROR : Status.SUCCESS,
-        error: err ?? null,
+        error: err ? (err.message ? err.message : `${err}`) : null,
       });
     }
   }

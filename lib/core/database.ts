@@ -135,7 +135,7 @@ export class Database implements IDatabase {
           allowNull: false,
         },
         error: {
-          type: DataTypes.STRING,
+          type: DataTypes.TEXT,
           allowNull: true,
         },
         createdAt: {
