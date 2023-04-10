@@ -5,7 +5,6 @@ import { IJob } from "../types/job";
 import { IJobDefinition, IJobOption } from "../types/job.definition";
 import { SchedulerConfig } from "../types/scheduler.config";
 import { SchedulerContext } from "./context";
-import { DEFAULT_JOB_TYPE } from "../constants/job.constants";
 import { ITaskRunner } from "../types/runner";
 
 export class TaskRunner extends EventEmitter implements ITaskRunner {
@@ -31,37 +30,31 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
   }
 
   public async kickOffJobs(): Promise<void> {
-    const jobDefinitions = this.context.getJobDefinitions();
+    const jobDefinitions = this.context.getFilteredJobDefinitions(this.config);
     const lockExpire = new Date(Date.now() - this.config.lockLifetime);
     await Promise.all(
-      Object.entries(jobDefinitions)
-        .filter(
-          ([name, def]) =>
-            !def.option.type ||
-            def.option.type === (this.config.type || DEFAULT_JOB_TYPE)
-        )
-        .map(
-          async ([name, def]: [
-            name: string,
-            jobDefinition: IJobDefinition
-          ]): Promise<void> => {
-            const job = await this.context.getJobRepository().findOne({
-              where: {
-                type: this.config.type ?? { [Op.ne]: null },
-                name,
-                disabled: { [Op.ne]: true },
-                [Op.or]: [
-                  { lockedAt: null, nextTickAt: { [Op.lte]: new Date() } },
-                  { lockedAt: { [Op.lte]: lockExpire } },
-                ],
-              },
-            });
-            if (job) {
-              this.context.injectJob(job);
-              await this.executeJob();
-            }
+      jobDefinitions.map(
+        async ([name, def]: [
+          name: string,
+          jobDefinition: IJobDefinition
+        ]): Promise<void> => {
+          const job = await this.context.getJobRepository().findOne({
+            where: {
+              type: this.config.type ?? { [Op.ne]: null },
+              name,
+              disabled: { [Op.ne]: true },
+              [Op.or]: [
+                { lockedAt: null, nextTickAt: { [Op.lte]: new Date() } },
+                { lockedAt: { [Op.lte]: lockExpire } },
+              ],
+            },
+          });
+          if (job) {
+            this.context.injectJob(job);
+            await this.executeJob();
           }
-        )
+        }
+      )
     );
   }
 

@@ -1,4 +1,3 @@
-import { Model } from "sequelize";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
 import { IJobDefinition, IJobOption } from "../types/job.definition";
@@ -16,6 +15,7 @@ import {
 import { JobStatus } from "../enums/job.status";
 import { Op } from "sequelize";
 import * as parser from "cron-parser";
+import { SchedulerConfig } from "../types/scheduler.config";
 
 export class SchedulerContext {
   private jobDefinitions: { [key: string]: IJobDefinition } = {};
@@ -33,6 +33,16 @@ export class SchedulerContext {
 
   public getJobDefinitions(): { [key: string]: IJobDefinition } {
     return this.jobDefinitions;
+  }
+
+  public getFilteredJobDefinitions(
+    config: SchedulerConfig
+  ): [string, IJobDefinition][] {
+    return Object.entries(this.jobDefinitions).filter(
+      ([name, def]): boolean =>
+        !def.option.type ||
+        def.option.type === (config.type || DEFAULT_JOB_TYPE)
+    );
   }
 
   public getRunningJobs(): IJob[] {
@@ -138,7 +148,7 @@ export class SchedulerContext {
     return cronTime.next().toDate();
   }
 
-  createJobDefinition(config: IJobOption): void {
+  private createJobDefinition(config: IJobOption): void {
     this.jobDefinitions[config.name] = {
       running: 0,
       lock: 0,
@@ -148,8 +158,27 @@ export class SchedulerContext {
         lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
         type: config.type || DEFAULT_JOB_TYPE,
         lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
+        priority: config.priority || DEFAULT_PRIORITY,
       },
       status: JobStatus.WAITING,
     };
+
+    this.reorderJobDefinitions();
+  }
+
+  private reorderJobDefinitions(): void {
+    this.jobDefinitions = Object.entries(this.jobDefinitions)
+      .sort(([name1, def1], [name2, def2]): number => {
+        if (def1.option.priority > def2.option.priority) {
+          return 1;
+        } else if (def1.option.priority < def2.option.priority) {
+          return -1;
+        }
+        return 0;
+      })
+      .reduce((acc, [name, def]): { [key: string]: IJobDefinition } => {
+        (acc as any)[name] = def;
+        return acc;
+      }, {});
   }
 }

@@ -19,7 +19,7 @@ async function example() {
   };
 
   const scheduler = new Scheduler();
-  await scheduler.init({ dbConfig: dbConfig, config });
+  await scheduler.init({ dbConfig, config });
 
   scheduler.enqueueJob({
     name: "halil",
