@@ -111,6 +111,7 @@ export class SchedulerContext {
       where: { name: config.name, disabled: { [Op.ne]: true } },
     });
     const payload: Partial<JobModel> = {
+      name: config.name,
       cron: config.cron,
       context: config.data,
       disabled: false,
