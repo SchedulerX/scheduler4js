@@ -9,7 +9,6 @@ export class JobLogModel
   implements JobLogEntityAttributes
 {
   id!: BigInt;
-  jobName!: string;
   jobId!: BigInt;
   jobTime!: Date;
   job!: JSON;

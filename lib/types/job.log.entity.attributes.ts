@@ -9,7 +9,6 @@ export type JobResultStatus = Status | string;
 
 export interface JobLogEntityAttributes {
   id: BigInt;
-  jobName: string;
   jobId: BigInt;
   jobTime: Date;
   job: JSON;

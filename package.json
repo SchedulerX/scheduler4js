@@ -1,7 +1,7 @@
 {
   "author": "Halil Baydar",
   "name": "scheduler4js",
-  "version": "1.0.39",
+  "version": "1.0.40",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index",

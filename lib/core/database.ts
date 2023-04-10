@@ -117,10 +117,6 @@ export class Database implements IDatabase {
           allowNull: false,
           primaryKey: true,
         },
-        jobName: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
         jobId: {
           type: DataTypes.BIGINT,
           allowNull: false,
@@ -140,7 +136,7 @@ export class Database implements IDatabase {
         },
         error: {
           type: DataTypes.STRING,
-          allowNull: false,
+          allowNull: true,
         },
         createdAt: {
           type: DataTypes.DATE,

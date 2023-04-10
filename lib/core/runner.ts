@@ -66,7 +66,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
   }
 
   private async executeJob(): Promise<void> {
-    const job = this.finJobToRun();
+    const job = this.findJobToRun();
     if (!job) return;
     try {
       job.removeFromQueue();
@@ -124,7 +124,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     return true;
   }
 
-  private finJobToRun(): IJob {
+  private findJobToRun(): IJob {
     const jobQueue = this.context.getJobQueue() || [];
     const jobDefinitions = this.context.getJobDefinitions() || [];
 
