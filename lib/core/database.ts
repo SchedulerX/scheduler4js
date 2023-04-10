@@ -6,6 +6,7 @@ import { IDatabase } from "../types/database";
 import { Sequelize } from "sequelize-typescript";
 import { JobStatus } from "../enums/job.status";
 import { DEFAULT_JOB_TYPE } from "../constants/job.constants";
+import { Timezone } from "../enums/timezone";
 
 export class Database implements IDatabase {
   private jobTable: typeof JobModel | undefined;
@@ -60,7 +61,7 @@ export class Database implements IDatabase {
         timezone: {
           type: DataTypes.STRING,
           allowNull: false,
-          defaultValue: "gtm0",
+          defaultValue: Timezone.EUROPE_ISTANBUL,
         },
         failCount: {
           type: DataTypes.BIGINT,

@@ -110,40 +110,31 @@ export class SchedulerContext {
     let job = await this.getJobRepository().findOne({
       where: { name: config.name, disabled: { [Op.ne]: true } },
     });
-    const payload = {
+    const payload: Partial<JobModel> = {
       cron: config.cron,
-      data: config.data,
+      context: config.data,
       disabled: false,
       timezone: config.timezone || DEFAULT_TIMEZONE,
       type: config.type || DEFAULT_JOB_TYPE,
       priority: config.priority || DEFAULT_PRIORITY,
       status: JobStatus.RUNNING,
+      nextTickAt: this.computeNextTick({
+        cron: config.cron,
+        timezone: config.timezone || DEFAULT_TIMEZONE,
+      }),
     };
     if (job) {
-      await this.getJobRepository().update(
-        {
-          ...payload,
-          nextTickAt: this.computeNextTick(job),
-        },
-        { where: { id: job.id } }
-      );
+      await this.getJobRepository().update(payload, { where: { id: job.id } });
     } else {
-      job = await this.getJobRepository().create<any>({
-        ...payload,
-        name: config.name,
-        nextTickAt: this.computeNextTick({
-          cron: config.cron,
-          timezone: config.timezone,
-        }),
-      });
+      job = await this.getJobRepository().create<any>(payload);
     }
     this.createJobDefinition(config);
   }
 
-  private computeNextTick(job: Partial<JobModel>): Date {
-    let cronTime = parser.parseExpression(job.cron!, {
+  private computeNextTick(config: { cron: string; timezone: string }): Date {
+    let cronTime = parser.parseExpression(config.cron!, {
       currentDate: new Date(),
-      tz: job.timezone,
+      tz: config.timezone,
     });
     return cronTime.next().toDate();
   }
