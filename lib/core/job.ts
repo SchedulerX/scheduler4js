@@ -12,17 +12,19 @@ import * as parser from "cron-parser";
 
 //eslint-disable-next-line @typescript-eslint/no-var-requires
 const moment = require("moment");
+
 export class Job implements IJob {
   private context;
   private definition;
   private jobModel;
+
   constructor(context: SchedulerContext, jobModel: JobModel) {
     this.context = context;
     this.jobModel = jobModel;
     this.definition = this.context.getJobDefinitions()[jobModel.name];
   }
 
-  shouldRun(): boolean {
+  public shouldRun(): boolean {
     const now = new Date();
     const currentTime = moment(now).tz(this.jobModel.timezone);
     const nextTickAt = moment(this.jobModel.lastTickAt || now).tz(
@@ -39,7 +41,7 @@ export class Job implements IJob {
     return this.definition;
   }
 
-  async saveLog(err?: any): Promise<void> {
+  public async saveLog(err?: any): Promise<void> {
     if (this.definition.option.saveLog) {
       await this.context.getJobLogRepository().create<any>({
         jobName: this.jobModel.name,
@@ -51,30 +53,37 @@ export class Job implements IJob {
       });
     }
   }
-  incrementFailCount(): void {
+
+  public incrementFailCount(): void {
     this.jobModel.failCount = (Number(this.jobModel.failCount || 0) + 1) as any;
   }
-  incrementSuccessCount(): void {
+
+  public incrementSuccessCount(): void {
     this.jobModel.successCount = (Number(this.jobModel.successCount || 0) +
       1) as any;
   }
-  removeFromQueue(): void {
+
+  public removeFromQueue(): void {
     const index = this.context.getJobQueue().indexOf(this);
     if (index > -1) {
       this.context.getJobQueue().splice(index, 1);
     }
   }
-  async save(): Promise<JobModel> {
+
+  public async save(): Promise<JobModel> {
     return await this.jobModel.save();
   }
-  moveToRunningJobs(): void {
+
+  public moveToRunningJobs(): void {
     this.context.getRunningJobs().push(this);
     this.changeJobStatus(JobStatus.RUNNING);
   }
-  handleJobFailure(): void {
+
+  public handleJobFailure(): void {
     this.changeJobStatus(JobStatus.FAILED);
   }
-  calculateNextTick(): void {
+
+  public calculateNextTick(): void {
     const expression = this.definition.option.cron!;
     const tz = this.definition.option.timezone;
     const currentDate = this.jobModel.lastTickAt;
@@ -86,7 +95,8 @@ export class Job implements IJob {
     const nextTick = cronTime.next().toDate();
     this.jobModel.nextTickAt = nextTick;
   }
-  finalize(): void {
+
+  public finalize(): void {
     const index = this.context.getRunningJobs().indexOf(this);
     if (index > -1) {
       this.context.getRunningJobs().splice(index, 1);
@@ -97,7 +107,8 @@ export class Job implements IJob {
     }
     this.changeJobStatus(JobStatus.FINISHED);
   }
-  changeJobStatus(status: JobStatus): void {
+
+  public changeJobStatus(status: JobStatus): void {
     this.definition.status = status;
     this.context.getJobDefinitions()[
       this.context.getJobDefinitions()[this.jobModel.name].option.name
@@ -105,13 +116,8 @@ export class Job implements IJob {
     this.definition.status = status;
     this.jobModel.status = status;
   }
+
   async run(): Promise<void> {
     await this.definition.option.fn();
-  }
-  isExpired(): boolean {
-    const lockDeadline = new Date(
-      Date.now() - (this.definition.option.lockExpire || 10 * 60 * 1000)
-    );
-    return (this.jobModel.lockedAt || Date.now()) < lockDeadline;
   }
 }

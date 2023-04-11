@@ -44,9 +44,6 @@ export interface IJob {
   // Define a function called run that returns a Promise that resolves to void
   run(): Promise<void>;
 
-  // Define a function called isExpired that returns a boolean value
-  isExpired(): boolean;
-
   // Define a function called getDefinition that returns an IJobDefinition instance
   getDefinition(): IJobDefinition;
 

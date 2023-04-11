@@ -17,6 +17,7 @@ export class Database implements IDatabase {
   private jobLogTable: typeof JobLogModel | undefined;
   private connection: Sequelize | undefined;
   private config: Options | undefined;
+
   constructor(config: Options) {
     this.config = config;
     this.connect();

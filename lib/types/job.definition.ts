@@ -24,9 +24,6 @@ export interface IJobOption {
   // Define an optional property called lockLimit of type number
   lockLimit?: number;
 
-  // Define an optional property called lockExpire of type number in ms
-  lockExpire?: number;
-
   // Define an optional property called data of type any
   data?: any;
 

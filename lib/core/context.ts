@@ -77,18 +77,17 @@ export class SchedulerContext {
     delete this.jobDefinitions[name];
   }
 
-  dequeueJob(name: string) {
+  public dequeueJob(name: string) {
     this.removeDefinition(name);
   }
 
   public localLockJob(job: IJob): boolean {
-    const jobDefinitions = this.getJobDefinitions();
     if (
-      jobDefinitions[job.getDefinition().option.name].lock! <
-      jobDefinitions[job.getDefinition().option.name].option.lockLimit!
+      this.jobDefinitions[job.getDefinition().option.name].lock! <
+      this.jobDefinitions[job.getDefinition().option.name].option.lockLimit!
     ) {
       this.getLockedJobs().push(job);
-      jobDefinitions[job.getDefinition().option.name].lock!++;
+      this.jobDefinitions[job.getDefinition().option.name].lock!++;
       return true;
     }
     return false;
@@ -110,7 +109,7 @@ export class SchedulerContext {
     this.jobQueue.push(jobInstance);
   }
 
-  async enqueueJob(config: IJobOption): Promise<void> {
+  public async enqueueJob(config: IJobOption): Promise<void> {
     let job = await this.getJobRepository().findOne({
       where: { name: config.name, disabled: { [Op.ne]: true } },
     });
@@ -153,7 +152,6 @@ export class SchedulerContext {
         concurrency: config.concurrency || DEFAULT_CONCURRENCY,
         lockLimit: config.lockLimit || DEFAULT_LOCK_LIMIT,
         type: config.type || DEFAULT_JOB_TYPE,
-        lockExpire: config.lockExpire || DEFAULT_LOCK_EXPIRE,
         priority: config.priority || DEFAULT_PRIORITY,
       },
       status: JobStatus.WAITING,
