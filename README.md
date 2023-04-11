@@ -15,13 +15,13 @@ The library provides a schedule class that accepts a task function and a config 
 
 #### Create db connection and library config to create instance of the library:
 
-### TS
+### TS IMPORT
 
 ```
 import { Scheduler, Frequency, Timezone, CronUtil } from 'scheduler4js';
 ```
 
-### JS
+### JS IMPORT
 
 ```
 const { Scheduler, Frequency, Timezone, CronUtil } = require("scheduler4js");
