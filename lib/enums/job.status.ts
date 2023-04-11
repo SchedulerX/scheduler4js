@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 // Define an enum called JobStatus
 export enum JobStatus {
   // The WAITING constant is assigned the value 0

@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 // Define an interface called Time
 export interface Time {
   // Define a property called hour that is a number

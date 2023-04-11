@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
@@ -27,9 +31,14 @@ export class Job implements IJob {
     return nextTickAt.isSameOrBefore(currentTime);
   }
 
-  getDefinition(): IJobDefinition {
+  public getJobModel(): JobModel {
+    return this.jobModel;
+  }
+
+  public getDefinition(): IJobDefinition {
     return this.definition;
   }
+
   async saveLog(err?: any): Promise<void> {
     if (this.definition.option.saveLog) {
       await this.context.getJobLogRepository().create<any>({
@@ -103,9 +112,6 @@ export class Job implements IJob {
     const lockDeadline = new Date(
       Date.now() - (this.definition.option.lockExpire || 10 * 60 * 1000)
     );
-    return (
-      (this.context.getJobDefinitions()[this.jobModel.name].lockedAt ||
-        Date.now()) < lockDeadline
-    );
+    return (this.jobModel.lockedAt || Date.now()) < lockDeadline;
   }
 }

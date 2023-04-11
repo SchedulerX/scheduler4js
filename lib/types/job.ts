@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJobDefinition } from "./job.definition";
@@ -45,4 +49,7 @@ export interface IJob {
 
   // Define a function called getDefinition that returns an IJobDefinition instance
   getDefinition(): IJobDefinition;
+
+  // Define a function called getJobModel that returns an JobModel instance
+  getJobModel(): JobModel;
 }

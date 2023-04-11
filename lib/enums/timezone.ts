@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 export enum Timezone {
   AMERICA_CAYENNE = "America/Cayenne",
   AMERICA_EIRUNEPE = "America/Eirunepe",

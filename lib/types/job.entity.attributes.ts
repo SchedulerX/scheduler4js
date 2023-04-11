@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { Optional } from "sequelize";
 
 export interface Context {}

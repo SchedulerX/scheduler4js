@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { JobStatus } from "../enums/job.status";
 
 // Define an interface called IJobOption
@@ -46,9 +50,6 @@ export interface IJobDefinition {
 
   // Define an optional property called running of type number
   running?: number;
-
-  // Define an optional property called lockedAt of type Date or null
-  lockedAt?: Date | null;
 
   // Define an optional property called lock of type number
   lock?: number;

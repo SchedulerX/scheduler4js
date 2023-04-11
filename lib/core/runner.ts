@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { Op } from "sequelize";
 import { EventEmitter } from "stream";
 import { JobModel } from "../models/model.job";
@@ -6,6 +10,11 @@ import { IJobDefinition, IJobOption } from "../types/job.definition";
 import { SchedulerConfig } from "../types/scheduler.config";
 import { SchedulerContext } from "./context";
 import { ITaskRunner } from "../types/runner";
+import {
+  DEFAULT_FREQUENCY,
+  DEFAULT_JOB_TYPE,
+  DEFAULT_LOCK_EXPIRE,
+} from "../constants/job.constants";
 
 export class TaskRunner extends EventEmitter implements ITaskRunner {
   private context: SchedulerContext;
@@ -13,9 +22,19 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
   constructor(context: SchedulerContext, config: SchedulerConfig) {
     super();
     this.context = context;
-    this.config = config;
+    this.config = {
+      frequency: config.frequency || DEFAULT_FREQUENCY,
+      type: config.type || DEFAULT_JOB_TYPE,
+      kick: config.kick || true,
+      lockLifetime: config.lockLifetime || DEFAULT_LOCK_EXPIRE,
+    };
+
+    if (this.config.kick != false) {
+      this.tick();
+    }
   }
-  dequeueJob(name: string): ITaskRunner {
+
+  public dequeueJob(name: string): ITaskRunner {
     this.context.dequeueJob(name);
     return this;
   }
@@ -24,33 +43,39 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     setInterval(this.kickOffJobs.bind(this), this.config.frequency);
   }
 
-  async enqueueJob(config: IJobOption): Promise<ITaskRunner> {
+  public enqueueJob(config: IJobOption): ITaskRunner {
     this.context.enqueueJob(config);
     return this;
   }
 
   public async kickOffJobs(): Promise<void> {
     const jobDefinitions = this.context.getFilteredJobDefinitions(this.config);
-    const lockExpire = new Date(Date.now() - this.config.lockLifetime);
+    const lockExpire = new Date(Date.now() - this.config.lockLifetime!);
     await Promise.all(
       jobDefinitions.map(
         async ([name, def]: [
           name: string,
           jobDefinition: IJobDefinition
         ]): Promise<void> => {
-          const job = await this.context.getJobRepository().findOne({
-            where: {
-              type: this.config.type ?? { [Op.ne]: null },
-              name,
-              disabled: { [Op.ne]: true },
-              [Op.or]: [
-                { lockedAt: null, nextTickAt: { [Op.lte]: new Date() } },
-                { lockedAt: { [Op.lte]: lockExpire } },
-              ],
+          const [count, jobs] = await this.context.getJobRepository().update(
+            {
+              lockedAt: new Date(),
             },
-          });
-          if (job) {
-            this.context.injectJob(job);
+            {
+              where: {
+                [Op.or]: [{ type: this.config.type! }, { type: null }],
+                name,
+                disabled: { [Op.ne]: true },
+                [Op.or]: [
+                  { lockedAt: null, nextTickAt: { [Op.lte]: new Date() } },
+                  { lockedAt: { [Op.lte]: lockExpire } },
+                ],
+              },
+              returning: true,
+            }
+          );
+          if (jobs && jobs.length > 0) {
+            this.context.injectJob(jobs[0]);
             await this.executeJob();
           }
         }
@@ -84,15 +109,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
   private async preRunJob(job: IJob): Promise<boolean> {
     if (job.shouldRun()) {
       if (this.context.localLockJob(job)) {
-        try {
-          if (await this.globalLockJob(job)) {
-            return true;
-          }
-        } catch (err) {
-          console.debug(`Error while locking job, message: ${err}`);
-          this.context.localUnLockJob(job);
-        }
-        return false;
+        return true;
       }
     }
     console.debug(
@@ -136,7 +153,6 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
 
   private async globalLockJob(job: IJob): Promise<boolean> {
     const now = new Date();
-    job.getDefinition().lockedAt = now;
     const [count] = await this.context
       .getJobRepository()
       .update(
@@ -151,19 +167,10 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       { lockedAt: null },
       {
         where: {
-          name: job.getDefinition().option.name,
-          lockedAt: job.getDefinition().lockedAt,
+          name: job.getJobModel().name,
+          lockedAt: job.getJobModel().lockedAt,
         },
       }
     );
-    const globalLockedAt =
-      this.context.getJobDefinitions()[job.getDefinition().option.name]
-        .lockedAt;
-    if (globalLockedAt == job.getDefinition().lockedAt) {
-      this.context.getJobDefinitions()[
-        job.getDefinition().option.name
-      ].lockedAt = null;
-    }
-    job.getDefinition().lockedAt = null;
   }
 }

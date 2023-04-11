@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { Options } from "sequelize/types";
 import { JobModel } from "../models/model.job";
 import { JobLogModel } from "../models/model.job.log";

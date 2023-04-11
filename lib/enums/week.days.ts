@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 // Define an enum called WEEK_DAYS
 export enum WEEK_DAYS {
   // The MONDAY constant is assigned the value 1

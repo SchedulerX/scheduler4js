@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 /*
   An amount of ms in second
 */

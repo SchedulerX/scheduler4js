@@ -1,3 +1,7 @@
+/**
+ * Author: Halil Baydar
+ */
+
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
 import { IJobDefinition, IJobOption } from "../types/job.definition";

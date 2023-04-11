@@ -32,19 +32,15 @@ export class Scheduler {
     await db.initJobLogTable();
     const context = new SchedulerContext(db);
     this.runner = new TaskRunner(context, config);
-
-    if (config.kick) {
-      this.runner.tick();
-    }
   }
 
   /**
-   * Define an async method called enqueueJob that takes a config object of type IJobOption and returns a Promise<void>
+   * Define an async method called enqueueJob that takes a config object of type IJobOption and returns void
    * Adds a new job to the task runner's queue
    * @param config
    */
-  public async enqueueJob(config: IJobOption): Promise<void> {
-    await this.runner!.enqueueJob(config);
+  public enqueueJob(config: IJobOption): void {
+    this.runner!.enqueueJob(config);
   }
 
   /**
