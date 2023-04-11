@@ -134,21 +134,15 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     return true;
   }
 
-  private findJobToRun(): IJob {
+  private findJobToRun(): IJob | undefined {
     const jobQueue = this.context.getJobQueue() || [];
     const jobDefinitions = this.context.getJobDefinitions() || [];
 
-    let index: number = 0;
-    for (index = jobQueue.length - 1; index > 0; index -= 1) {
-      if (
-        jobDefinitions[jobQueue[index].getDefinition().option.name].option
-          .concurrency! >
-        jobDefinitions[jobQueue[index].getDefinition().option.name].running!
-      ) {
-        break;
-      }
-    }
-    return jobQueue[index];
+    return jobQueue.find(
+      (job) =>
+        jobDefinitions[job.getDefinition().option.name].option.concurrency! >
+        jobDefinitions[job.getDefinition().option.name].running!
+    );
   }
 
   private async globalLockJob(job: IJob): Promise<boolean> {

@@ -166,9 +166,9 @@ export class SchedulerContext {
     this.jobDefinitions = Object.entries(this.jobDefinitions)
       .sort(([name1, def1], [name2, def2]): number => {
         if (def1.option.priority > def2.option.priority) {
-          return -1;
-        } else if (def1.option.priority < def2.option.priority) {
           return 1;
+        } else if (def1.option.priority < def2.option.priority) {
+          return -1;
         }
         return 0;
       })
