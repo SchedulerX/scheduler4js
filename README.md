@@ -3,6 +3,17 @@
 Scheduler4js is a library for scheduling tasks in Node.JS.
 This library makes easier to dynamically create cron jobs running on sql database from client side.
 
+| Feature                    |   scheduler4js   |
+| :------------------------- | :--------------: |
+| Backend                    | Postgresql/Mssql |
+| Priorities                 |        ✓         |
+| Concurrency                |        ✓         |
+| Global events              |        ✓         |
+| Atomic ops                 |        ✓         |
+| Persistence                |        ✓         |
+| Supports long running jobs |        ✓         |
+| Optimized for              |       Jobs       |
+
 ### Installation
 
 ```
@@ -15,19 +26,19 @@ The library provides a schedule class that accepts a task function and a config 
 
 #### Create db connection and library config to create instance of the library:
 
-### TS IMPORT
+### TS
 
-```
-import { Scheduler, Frequency, Timezone, CronUtil } from 'scheduler4js';
+```js
+import { Scheduler, Frequency, Timezone, CronUtil } from "scheduler4js";
 ```
 
-### JS IMPORT
+### JS
 
-```
+```js
 const { Scheduler, Frequency, Timezone, CronUtil } = require("scheduler4js");
 ```
 
-```
+```js
 async function example() {
   const dbConfig = {
     port: 5432,
@@ -50,7 +61,7 @@ async function example() {
   await scheduler.init({ dbConfig, config });
 
   scheduler.enqueueJob({
-    name: "halil",
+    name: "scheduler4js",
     concurrency: 1,
     type: "x",
     timezone: Timezone.ASIA_DUBAI,
@@ -65,7 +76,6 @@ async function example() {
 }
 
 example();
-
 ```
 
 ### Output:
