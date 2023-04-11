@@ -24,7 +24,7 @@ npm i scheduler4js
 
 ### Usage:
 
-The library provides a schedule class that accepts a task function and a config representing when the task should be run.
+This library provides a schedule class that accepts a task function and a config representing when the task should be run.
 
 #### Create db connection and library config to create instance of the library:
 
@@ -97,12 +97,14 @@ Schedules a task to repeat at the specified date.
 - name: The name of the job
 - concurrency: The concurrency of the job
 - type: The type of the job which shows which executor should execute the given job
-- lockExpire: It shows locking life time of the given job
 - lockLimit: It shows the number of lock limit
 - fn: A function to run when the scheduled time arrives.
 - cron: It's cron expression representing the time to run the task again and again.
 - saveLog: It saves the result of the given jobs when they run
 - priority: Reorder jobs according to the given priority
+- frequency: It specifies the frequency which master cron job repeats in a minute
+- lockLifetime: It shows the lock life time of the jobs in ms
+- kick: To kick jobs to run
 
 ### License
 
