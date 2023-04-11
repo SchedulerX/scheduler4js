@@ -1,7 +1,7 @@
 {
   "author": "Halil Baydar",
   "name": "scheduler4js",
-  "version": "1.0.49",
+  "version": "1.0.50",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index",
@@ -18,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Scheduler4X/scheduler4js.git"
+    "url": "git+https://github.com/SchedulerX/scheduler4js.git"
   },
   "keywords": [
     "scheduler",
@@ -42,6 +42,6 @@
     "sequelize-typescript": "^2.1.5"
   },
   "bugs": {
-    "url": "https://github.com/Scheduler4X/scheduler4js/issues"
+    "url": "https://github.com/SchedulerX/scheduler4js/issues"
   }
 }
