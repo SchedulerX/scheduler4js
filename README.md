@@ -55,7 +55,6 @@ async function example() {
     type: "x",
     timezone: Timezone.ASIA_DUBAI,
     cron: CronUtil.EVERY_X_MINUTE(1),
-    lockExpire: 60 * 1000,
     lockLimit: 1,
     fn: () => {
       console.log(`Job run at the time of ${new Date()}`);
