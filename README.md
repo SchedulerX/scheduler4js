@@ -63,7 +63,7 @@ async function example() {
   await scheduler.init({ dbConfig, config });
 
   scheduler.enqueueJob({
-    name: "scheduler4js",
+    name: "example",
     concurrency: 1,
     type: "x",
     timezone: Timezone.ASIA_DUBAI,
