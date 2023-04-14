@@ -51,4 +51,12 @@ export class Scheduler {
   public dequeueJob(name: string): void {
     this.runner!.dequeueJob(name);
   }
+
+  public on(event: string, listener: (...args: any) => void): void {
+    this.runner!.on(event, listener);
+  }
+
+  public once(event: string, listener: (...args: any) => void): void {
+    this.runner!.once(event, listener);
+  }
 }

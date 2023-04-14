@@ -69,25 +69,27 @@ async function example() {
     timezone: Timezone.ASIA_DUBAI,
     cron: CronUtil.EVERY_X_MINUTE(1),
     lockLimit: 1,
+    saveLog: false,
+    priority: 0,
     fn: () => {
       console.log(`Job run at the time of ${new Date()}`);
     },
-    saveLog: false,
-    priority: 0,
+  });
+
+  scheduler.on("begin", (job) => {
+    console.log("begin", job);
+  });
+
+  scheduler.on("completed", (job) => {
+    console.log("completed", job);
+  });
+
+  scheduler.on("fail", (err, job) => {
+    console.log("fail", err, job);
   });
 }
 
 example();
-```
-
-### Output:
-
-```js
-Job run at the time of Sat Apr 08 2023 08:01:05 GMT+0300 (GMT+03:00)
-Job run at the time of Sat Apr 08 2023 08:02:05 GMT+0300 (GMT+03:00)
-Job run at the time of Sat Apr 08 2023 08:03:05 GMT+0300 (GMT+03:00)
-Job run at the time of Sat Apr 08 2023 08:04:05 GMT+0300 (GMT+03:00)
-Job run at the time of Sat Apr 08 2023 08:05:05 GMT+0300 (GMT+03:00)
 ```
 
 ### API
