@@ -91,7 +91,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     if (await this.preRunJob(job)) {
       job.moveToRunningJobs();
       const childRunner = job.run();
-      childRunner.send(job.getDefinition().option.fn.toString());
+      childRunner.send({ fn: job.getDefinition().option.fn.toString() });
       childRunner.on("message", async (message: { err?: string }) => {
         if (message?.err) {
           job.handleJobFailure();

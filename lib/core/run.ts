@@ -1,5 +1,6 @@
-process.on("message", async (fn: string) => {
+process.on("message", async (params: { fn: string }) => {
   try {
+    const { fn } = params;
     const asyncFn = new Function("return " + fn)();
     await asyncFn();
     process.exit(0);
