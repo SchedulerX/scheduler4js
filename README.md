@@ -3,18 +3,18 @@
 Scheduler4js is a library for scheduling tasks in Node.JS.
 This library makes easier to dynamically create cron jobs running on sql database from client side.
 
-| Feature                    |   scheduler4js   |
-| :------------------------- | :--------------: |
-| Backend                    | Postgresql/Mssql |
-| Priorities                 |        ✓         |
-| Concurrency                |        ✓         |
-| Global events              |        ✓         |
-| Atomic ops                 |        ✓         |
-| Persistence                |        ✓         |
-| Supports long running jobs |        ✓         |
-| Supports logging           |        ✓         |
-| Supports group jobs        |        ✓         |
-| Optimized for              |       Jobs       |
+| Feature                    | scheduler4js |
+| :------------------------- | :----------: |
+| Backend                    |  Postgresql  |
+| Priorities                 |      ✓       |
+| Concurrency                |      ✓       |
+| Global events              |      ✓       |
+| Atomic ops                 |      ✓       |
+| Persistence                |      ✓       |
+| Supports long running jobs |      ✓       |
+| Supports logging           |      ✓       |
+| Supports group jobs        |      ✓       |
+| Optimized for              |     Jobs     |
 
 ### Installation
 
@@ -107,6 +107,11 @@ Schedules a task to repeat at the specified date.
 - frequency: It specifies the frequency which master cron job repeats in a minute
 - lockLifetime: It shows the lock life time of the jobs in ms
 - kick: To kick jobs to run
+
+### Notes:
+
+- Postgresql
+  - npm i pg // install pg package for postgresql db
 
 ### License
 

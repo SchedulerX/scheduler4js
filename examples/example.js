@@ -12,7 +12,7 @@ async function example() {
   };
 
   const config = {
-    frequency: Frequency.ONCE_IN_HALF_MINUTE,
+    frequency: Frequency.ONCE_IN_QUARTER_MINUTE,
     lockLifetime: 6 * 1000,
     type: "x",
     kick: true,
@@ -26,7 +26,7 @@ async function example() {
     concurrency: 1,
     type: "x",
     timezone: Timezone.ASIA_DUBAI,
-    cron: CronUtil.EVERY_X_MINUTE(1),
+    cron: CronUtil.EVERY_X_SECOND(30),
     lockLimit: 1,
     saveLog: false,
     priority: 0,

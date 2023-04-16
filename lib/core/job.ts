@@ -2,6 +2,7 @@
  * Author: Halil Baydar
  */
 
+import { ChildProcess, fork } from "child_process";
 import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
@@ -117,7 +118,12 @@ export class Job implements IJob {
     this.jobModel.status = status;
   }
 
-  async run(): Promise<void> {
-    await this.definition.option.fn();
+  run(): ChildProcess {
+    const childRunner = fork(`${__dirname}/run.js`, {
+      detached: true,
+      serialization: "advanced",
+      timeout: 10 * 60 * 1000,
+    });
+    return childRunner;
   }
 }

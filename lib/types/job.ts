@@ -2,6 +2,7 @@
  * Author: Halil Baydar
  */
 
+import { ChildProcess } from "child_process";
 import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJobDefinition } from "./job.definition";
@@ -41,8 +42,8 @@ export interface IJob {
   // Define a function called changeJobStatus that takes a parameter of type JobStatus and returns void
   changeJobStatus(status: JobStatus): void;
 
-  // Define a function called run that returns a Promise that resolves to void
-  run(): Promise<void>;
+  // Define a function called run that returns a ChildProcess to run job in different core
+  run(): ChildProcess;
 
   // Define a function called getDefinition that returns an IJobDefinition instance
   getDefinition(): IJobDefinition;

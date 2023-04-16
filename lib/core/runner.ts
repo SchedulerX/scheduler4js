@@ -87,27 +87,32 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
     const job = this.findJobToRun();
     if (!job) return;
     this.emit("begin", job);
-    try {
-      job.removeFromQueue();
-      if (await this.preRunJob(job)) {
-        job.moveToRunningJobs();
-        await job.run();
-        this.emit("success", job);
-        job.incrementSuccessCount();
-        await job.saveLog();
-        this.emit("logSaved", job);
-      }
-    } catch (err) {
-      job.handleJobFailure();
-      job.incrementFailCount();
-      await job.saveLog(err);
-      this.emit("fail", err, job);
-    } finally {
-      job.finalize();
-      job.calculateNextTick();
-      await job.save();
-      await this.postRunJob(job);
-      this.emit("completed", job);
+    job.removeFromQueue();
+    if (await this.preRunJob(job)) {
+      job.moveToRunningJobs();
+      const childRunner = job.run();
+      childRunner.send(job.getDefinition().option.fn.toString());
+      childRunner.on("message", async (message: { err?: string }) => {
+        if (message?.err) {
+          job.handleJobFailure();
+          job.incrementFailCount();
+          await job.saveLog(message.err);
+          this.emit("fail", message.err, job);
+        }
+      });
+      childRunner.on("exit", async (code, signal) => {
+        if (code == 0) {
+          this.emit("success", job);
+          job.incrementSuccessCount();
+          await job.saveLog();
+          this.emit("logSaved", job);
+        }
+        job.finalize();
+        job.calculateNextTick();
+        await job.save();
+        await this.postRunJob(job);
+        this.emit("completed", job);
+      });
     }
   }
 
@@ -118,7 +123,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       }
     }
     console.debug(
-      `Job with name :${job.getDefinition().option.name} cannot locked`
+      `Job with name :${job.getDefinition().option.name} cannot be locked`
     );
     return false;
   }

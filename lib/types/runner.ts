@@ -8,7 +8,6 @@ import { IJobOption } from "./job.definition";
 // Define an interface called ITaskRunner
 export interface ITaskRunner {
   // Register to scheduler4js' eventlistener
-  emit(event: string): unknown;
   once(event: string, listener: (...args: any) => void): this;
   on(event: string, listener: (...args: any) => void): this;
 
