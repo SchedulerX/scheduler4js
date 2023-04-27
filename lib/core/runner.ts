@@ -86,16 +86,16 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
   private async executeJob(): Promise<void> {
     const job = this.findJobToRun();
     if (!job) return;
-    this.emit("begin", job);
+    this.emit("begin", job.toJSON());
     try {
       job.removeFromQueue();
       if (await this.preRunJob(job)) {
         job.moveToRunningJobs();
         await job.run();
-        this.emit("success", job);
+        this.emit("success", job.toJSON());
         job.incrementSuccessCount();
         await job.saveLog();
-        this.emit("logSaved", job);
+        this.emit("logSaved", job.toJSON());
       }
     } catch (err) {
       job.handleJobFailure();
@@ -107,7 +107,7 @@ export class TaskRunner extends EventEmitter implements ITaskRunner {
       job.calculateNextTick();
       await job.save();
       await this.postRunJob(job);
-      this.emit("completed", job);
+      this.emit("completed", job.toJSON());
     }
   }
 

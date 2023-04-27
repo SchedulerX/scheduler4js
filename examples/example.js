@@ -18,8 +18,7 @@ async function example() {
     kick: true,
   };
 
-  const scheduler = new Scheduler();
-  await scheduler.init({ dbConfig, config });
+  const scheduler = await Scheduler.init({ dbConfig, config });
 
   scheduler.enqueueJob({
     name: "halil",

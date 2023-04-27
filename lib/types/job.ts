@@ -5,9 +5,11 @@
 import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJobDefinition } from "./job.definition";
+import { JobJSON } from "./job.json";
 
 // Define an interface called IJob
 export interface IJob {
+  toJSON(): JobJSON;
   // Define a function called shouldRun that returns a boolean value
   shouldRun(): boolean;
 

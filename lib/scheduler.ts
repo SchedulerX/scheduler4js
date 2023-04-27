@@ -14,24 +14,29 @@ export class Scheduler {
   /**
    * Declare a private member variable called runner of type ITaskRunner | undefined
    */
-  private runner: ITaskRunner | undefined;
+  private runner: ITaskRunner | undefined | null;
+
+  constructor(runner: ITaskRunner) {
+    this.runner = runner;
+  }
 
   /**
-   * Define an async method called init that takes a params object with dbConfig and config properties
+   * Define an init function that takes a params object with dbConfig and config properties
    * Initializes the database and task runner with the given configuration options
    *
    * @param params
    */
-  async init(params: {
+  static async init(params: {
     dbConfig: Options;
     config: SchedulerConfig;
-  }): Promise<void> {
+  }): Promise<Scheduler> {
     const { dbConfig, config } = params;
     const db = new Database(dbConfig);
     await db.initJobTable();
     await db.initJobLogTable();
     const context = new SchedulerContext(db);
-    this.runner = new TaskRunner(context, config);
+    const runner = new TaskRunner(context, config);
+    return new Scheduler(runner);
   }
 
   /**

@@ -4,8 +4,7 @@
 
 import { JobStatus } from "../enums/job.status";
 
-// Define an interface called IJobOption
-export interface IJobOption {
+export interface IJobAttributes {
   // Define a required property called name of type string
   name: string;
 
@@ -32,7 +31,9 @@ export interface IJobOption {
 
   // Define a required property called priority of type number
   priority: number;
-
+}
+// Define an interface called IJobOption
+export interface IJobOption extends IJobAttributes {
   // Define a required property called fn of type function that takes any number of arguments and returns any type
   fn: (...args: any[]) => any;
 }

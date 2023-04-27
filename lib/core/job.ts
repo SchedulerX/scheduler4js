@@ -6,6 +6,7 @@ import { JobStatus } from "../enums/job.status";
 import { JobModel } from "../models/model.job";
 import { IJob } from "../types/job";
 import { IJobDefinition } from "../types/job.definition";
+import { JobJSON } from "../types/job.json";
 import { Status } from "../types/job.log.entity.attributes";
 import { SchedulerContext } from "./context";
 import * as parser from "cron-parser";
@@ -22,6 +23,22 @@ export class Job implements IJob {
     this.context = context;
     this.jobModel = jobModel;
     this.definition = this.context.getJobDefinitions()[jobModel.name];
+  }
+
+  public toJSON(): JobJSON {
+    return {
+      running: this.definition.running,
+      lock: this.definition.lock,
+      status: this.definition.status,
+      name: this.definition.option.name,
+      concurrency: this.definition.option.concurrency,
+      type: this.definition.option.type,
+      timezone: this.definition.option.timezone,
+      cron: this.definition.option.cron,
+      lockLimit: this.definition.option.lockLimit,
+      saveLog: this.definition.option.saveLog,
+      priority: this.definition.option.priority,
+    };
   }
 
   public shouldRun(): boolean {
