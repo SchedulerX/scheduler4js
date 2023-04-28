@@ -6,3 +6,4 @@ export * from "./enums/job.status";
 export * from "./types/scheduler.config";
 export * from "./utils/cron.expression.generator";
 export * from "./types/job";
+export { Options } from "sequelize";
